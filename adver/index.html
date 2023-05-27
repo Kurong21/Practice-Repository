@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice</title>
+
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <h1 class="logo">ADVENTURE</h1>
+        <ul class="nav-links">
+            <li class="home"><a href="#"></a>Home</li>
+            <li><a href="#"></a>Tools</li>
+            <li><a href="#"></a>Explore</li>
+            <li><a href="#"></a>About</li>
+            <a href="#" class="btn">Contact</a>
+        </ul>
+        <img class="menu-btn" src="./images/img/menu-btn.png">
+    </nav>
+    <header>
+        <div class="header-content">
+            <h2>Explore The Colourful World</h2>
+            <div class="line"></div>
+            <h1>A WONDERFUL GIFT</h1>
+            <a href="#" class="btn">Learn More</a>
+        </div>
+    </header>
+    
+    <section class="events">
+        <div class="title">
+            <h1>Upcoming Events</h1>
+            <div class="line"></div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <img src="./images/img/img1.png">
+                <h4>Everest Camp Trek</h4>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus qui,iure possimus libarn axnidta incidunt! </p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+            <div class="col">
+                <img src="./images/img/img2.png">
+                <h4>Everest Camp Trek</h4>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus qui,iure possimus libarn axnidta incidunt! </p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="expore">
+        <div class="expore-content">
+            <h1>EXPLORE THE WORLD</h1>
+            <div class="line"></div>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus qui,iure possimus libarn axnidta incidunt! </p>
+            <a href="#" class="btn">Learn More</a>
+        </div>
+    </section>
+
+    <section class="tours">
+        <div class="row">
+            <div class="col">
+                <h1>UpcOMING TOURS & DESTINATION</h1>
+                <div class="line"></div>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus qui,iure possimus libarn axnidta incidunt! </p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+            <div class="image-col">
+                <div class="img-list">
+                    <img src="./images/img/img3.png">
+                    <img src="./images/img/img4.png">
+                    <img src="./images/img/img5.png">
+                    <img src="./images/img/img6.png">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="footer">
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
+        <p>CopyRight @ 2023 TR</p>
+    </section>
+    <script>
+        var menuBtn = document.querySelector(".menu-btn");
+        var navLinks = document.querySelector(".nav-links");
+        menuBtn.addEventListener("click",()=>{
+            navLinks.classList.toggle("open");
+        })
+    </script>
+</body>
+</html>
