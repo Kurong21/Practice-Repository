@@ -1,0 +1,411 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-weight: normal;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 1.5;
+    font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft YaHei", sans-serif;
+    color: #333;
+    background-color: #fff;
+    /* min-width: 1226px; */
+    overflow-x: hidden;
+}
+@font-face {
+    font-family: 'iconfont';
+    src: url('iconfont.eot'),
+    url('../iconfont/iconfont.woff') format('woff'),
+}
+
+.iconfont{
+    font-family:"iconfont" !important;
+    font-size:16px;font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.top{
+    width: 100%;
+    height: 120px;
+    background: url("../images/1-top/topBanner.jpg") no-repeat center center;
+    background-size: cover;
+    background-position: bottom;
+    cursor: pointer;
+}
+
+.nav{
+    width: 100%;
+    min-width: 50vw;
+    height: 40px;
+    background-color: #333;
+}
+
+.nav_content{
+    width: 1226px;
+    min-width: 1226px;
+    height: 40px;
+    margin: 0 auto;
+}
+
+.login{
+    float: right;
+}
+
+.nav_service{
+    float: left;
+    list-style: none;
+}
+
+.nav_service li{
+    display: inline-block;
+    padding: 0 5px;
+    line-height: 40px;
+    cursor: pointer;
+    color: whitesmoke;
+}
+
+.nav_service li a{
+    color:#b0b0b0;
+    transition: all 0.5s;
+    font-size: 1.5vmin;
+    text-decoration: none;
+}
+
+.nav_service span{
+    color: #424242;
+}
+
+.nav_service li a:hover{
+    color: white;
+}
+
+.nav_personal li{
+    display: inline-block;
+    line-height: 40px;
+    padding: 0 5px;
+    font-size: 1.5vmin;
+}
+
+.highLight{
+    background-color: #424242;
+}
+
+.highLight i{
+    font-family: "iconfont" !important;
+    font-size: 25px;
+    font-style: normal;
+    line-height: 20px;
+    vertical-align: -2px;
+    margin-right: 4px;
+    color: #b0b0b0;
+}
+
+.nav_personal li a{
+    color: #b0b0b0;
+    text-decoration: none;
+    transition: all 0.5s;
+}
+
+.nav_personal li a:hover{
+    color: whitesmoke;
+}
+
+.nav_personal span{
+    color: #424242;
+}
+
+.content{
+    width: 1226px;
+    min-width: 1226px;
+    height: 120vh;
+    margin: 0 auto;
+}
+
+.logoNav{
+    width: 1226px;
+    min-width: 1226px;
+    height: 100px;
+    text-align: center;
+    line-height: 100px;
+    float: left;
+    font-size: 0;
+}
+
+.imgCntent{
+    float: left;
+    margin-top: 23px;
+}
+
+.ification{
+    float: left;
+    margin-left: 174px;
+}
+
+.ification ul li{
+    padding: 0 8px;
+    display: inline-flex;
+    list-style: none;
+    text-align: right;
+}
+
+.logoNav ul li a{
+    text-decoration: none;
+    color: #333;
+    font-size: 1.8vmin;
+    cursor: pointer;
+}
+
+.logoNav ul li a:hover{
+    border-bottom: rgb(241, 101, 8) 2px solid;
+}
+
+.searchInput{
+    float: left;
+    margin-top: 23px;
+    margin-left: 57px;
+}
+
+.searchInput .ser{
+    width: 230px;
+    height: 50px;
+    border:  1px solid #e0e0e0;
+    float: left;
+    outline: none;
+}
+
+.searchInput .sub{
+    width: 50px;
+    height: 50px;
+    border:  1px solid #e0e0e0;
+    float: left;
+    font-family: "iconfont" !important;
+    font-size: 25px;
+    color: #424242;
+}
+
+.sub:hover{
+    background-color: rgb(241, 101, 8);
+    transition: all 0.5s;
+}
+
+.banner{
+    width: 1226px;
+    height: 460px;
+    background-size: cover;
+    float: left;
+    overflow: hidden;
+    position: relative;
+}
+/* 
+    animation: move 30s linear infinite 0s normal;
+    参数依次为：定义的动画的名字 动画持续的时间 运动方式 动画循环执行的次数 动画延迟执行的时间 动画运行方向
+
+    运动方式有：linear线性过渡，ease平滑过渡，ease-in由慢到快，ease-out由慢到快，ease-in-out由慢到快再到慢
+    动画执行次数的值有：infinite无限循环，number循环的次数
+    运动方向：normal正常方向，reverse反方向运行，alternate先正常再反方向并持续交替运行，alternate-reverse先反再正，持续交替运行
+*/
+.showBanner{
+    width: 7400px;
+    height: 460px;
+    animation: move 30s linear infinite 0s normal paused;
+}
+
+/* 
+    @keyframes move表示定义了一个名为move的动画关键帧规则
+    0%{margin-left: 0}表示在0%这个时间点，元素的margin-left为0。
+    后面依此类推
+*/
+@keyframes move {
+    0% {
+        margin-left: 0;
+    }
+    18% {
+        margin-left: 0;
+    }
+    
+    20% {
+        margin-left: -1226px;
+    }
+    38% {
+        margin-left: -1226px;
+    }
+    40% {
+        margin-left: -2452px;
+    }
+    58% {
+        margin-left: -2452px;
+    }
+    60% {
+        margin-left: -3678px;
+    }
+    78% {
+        margin-left: -3678px;
+    }
+    80% {
+        margin-left: -4904px;
+    }
+    98% {
+        margin-left: -4904px;
+    }
+    100% {
+        margin-left: -6130px;
+    }
+}
+
+.showBanner li{
+    width: 1226px;
+    height: 460px;
+    list-style: none;
+    float: left;
+    cursor: pointer;
+}
+
+.menu{
+    width: 234px;
+    height: 460px;
+    background-color: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 20px 0;
+}
+
+.menu ul li{
+    list-style: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.menu ul li a{
+    text-decoration: none;
+    color: #e0e0e0;
+    font-size: 1.5vmin;
+    padding-left: 25px;
+    line-height: 42px;
+}
+
+.menu ul li:hover{
+    background-color: rgb(241, 101, 8);
+}
+
+.menu ul li span{
+    color: #e0e0e0;
+    font-size: 1.5vmin;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.ward{
+    width: 40px;
+    height: 70px;
+    font-size: 50px;
+    color: #757575;
+    position: absolute;
+    cursor: pointer;
+    z-index: 2;
+    font-family: "iconfont" !important;
+    top: 50%;
+    margin-top: -35px;
+    transition: all .5s;
+}
+
+.ward:hover{
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.forward{
+    left: 230px;
+}
+
+.backward{
+    right: 0;
+}
+
+.point{
+    height: 20px;
+    position: absolute;
+    right: 30px;
+    bottom: 15px;
+}
+
+.point span{
+    float: left;
+    width: 6px;
+    height: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 5px;
+    margin: 0 5px;
+    border-color: rgba(0, 0, 0, 0.4);
+    transition: all .3s;
+    cursor: pointer;
+}
+
+.point span:hover{
+    background-color: #b0b0b0;
+}
+
+.recommend{
+    width: 100%;
+    height: 170px;
+    float: left;
+    margin: 14px auto 26px;
+}
+
+.app{
+    width: 234px;
+    height: 170px;
+    float: left;
+    background-color: #5f5750;
+    text-align: center;
+}
+
+.app li{
+    float: left;
+    width: 78px;
+    height: 85px;
+    padding: 18px 3px 0;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color .2s;
+    border-left: 1px solid #757575;
+    border-bottom: 1px solid #757575;
+    cursor: pointer;
+    list-style: none;
+    z-index: 2;
+}
+
+.app li:hover{
+    color: #fff;
+}
+
+.app li i{
+    display: block;
+    font-size: 24px;
+    line-height: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    font-family: "iconfont" !important;
+}
+
+.productImg{
+    width: 992px;
+    height: 170px;
+    float: left;
+}
+
+.productImg li{
+    float: left;
+    list-style: none;
+    margin-left: 14.6px;
+}
+
+.productImg li img{
+    width: 316px;
+    height: 170px;
+}
