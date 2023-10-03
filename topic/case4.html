@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+        //手写call()
+        Function.prototype.call = function(oTarget,...arg){
+            //判断传入进来的对象
+            const isStrict = (function(){ return this == undefined})();
+            if(!isStrict){
+                //非严格模式下null 和 undefined 将被替换为全局对象
+                oTarget = oTarget ?? window;
+                //传入原始类型 返回包装对象
+                const type = typeof oTarget;
+                if(type === "string"){
+                    oTarget = new String(oTarget);
+                }else if(type === "boolean"){
+                    oTarget = new Boolean(oTarget);
+                }else if(type === "number"){
+                    oTarget = new Number(oTarget);
+                }else if(type === "bigint"){
+                    oTarget = new BigInt(oTarget);
+                }else if(type === "symbol"){
+                    oTarget = new Symbol(oTarget);
+                }
+            }
+            //在传入的对象上新增一个方法，这个方法是调用call()的函数。所以是this.
+            oTarget.fn = this;
+            //处理传入的参数,从传入的第二个参数开始
+            var arr = [];
+            for(var i = 1;length = arguments.length,i < length;i++){
+                arr.push(arguments[i]);
+            }
+            //执行该函数
+            const result = oTarget.fn(...arr);
+            //删除在传入对象上新增的方法
+            delete oTarget.fn;
+            //返回
+            return result;
+            
+        }
+
+
+        function func(arg){
+            console.log(this,arg);
+        }
+        const o = {
+            a:3,
+        }
+        func.call(34,'peter');
+
+        //手写apply()
+        Function.prototype.apply = function(oTarget,arg){
+            const isStrict = (function(){ return this == undefined})();
+            if(!isStrict){
+                //非严格模式下null 和 undefined 将被替换为全局对象
+                oTarget = oTarget ?? window;
+                //传入原始类型 返回包装对象
+                const type = typeof oTarget;
+                if(type === "string"){
+                    oTarget = new String(oTarget);
+                }else if(type === "boolean"){
+                    oTarget = new Boolean(oTarget);
+                }else if(type === "number"){
+                    oTarget = new Number(oTarget);
+                }else if(type === "bigint"){
+                    oTarget = new BigInt(oTarget);
+                }else if(type === "symbol"){
+                    oTarget = new Symbol(oTarget);
+                }
+            }
+            
+            oTarget.fn = this;
+            var result;
+            if(!Array.isArray(arguments[1])){
+                throw Error("你必须传入一个数组");
+            }else{
+                var arr = [];
+                for(var i = 1;length = arguments.length,i < length;i++){
+                    arr.push(arguments[i]);
+                }
+                result = oTarget.fn(arr);
+            }
+            delete oTarget.fn;
+            return result;  
+        }
+        function func1(arg){
+            console.log(this,...arg);
+        }
+        const o1 = {
+            a:3,
+        }
+        func1.apply(23,['peter','tom']);
+
+
+        //手写bind()
+        // Function.prototype.bind = function(oTarget){
+        //     if(typeof this != "function"){
+        //         throw Error("仅限于方法调用");
+        //     }
+        //     const self = this;
+        //     let args = Array.from(arguments).slice(1);
+        //     const fnOP = function(){};
+        //     const fBound = function(){
+        //         let arg = Array.from(arguments).slice();
+        //         return self.call(this instanceof fBound ? this:oTarget,...args.concat(arg));
+        //     }
+        //     fnOP.prototype = this.prototype;
+        //     fBound.prototype = fnOP.prototype;
+        //     return fBound;
+        // }
+        
+        // function func2(a,b){
+        //     console.log(this);
+        //     console.log(a);
+        //     console.log(b);
+        // }
+        // const o2 = {
+        //     a:3,
+        //     b:2,
+        // }
+        // const bindFn = func2.bind(o2,o2.a);
+        // // bindFn();
+        // const obj = new bindFn(o2.b);
+        // console.log(obj.a);
+        var value = 1;
+        const obj = {
+            value:2,
+        }
+        function foo(a,b){
+            console.log(this);
+            console.log(`当前value = ${this.value}`);
+            console.log(`a = ${a}`);
+            console.log(`b = ${b}`);
+        }
+
+        Function.prototype.bind = function(oTarget){
+            //判断是否是函数调用
+            if(typeof this != "function") throw Error("仅限函数调用");
+            //
+            const self = this;
+            //获取参数
+            let args = Array.from(arguments).slice(1);
+            var bond = function(){
+                let arg = Array.from(arguments).slice();
+                let allArgs = args.concat(arg);
+                return self.call(oTarget,...allArgs);
+            }
+            return bond;
+        }
+        var bindFn = foo.bind(obj,1);
+        // bindFn(2);
+        const newFn = new bindFn(3);  
+
+
+        
+    </script>
+</body>
+</html>

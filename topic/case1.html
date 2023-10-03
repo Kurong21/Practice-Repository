@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .options li {
+            float: left;
+            width: 100px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border: solid 1px #ddd;
+            cursor: pointer;
+        }
+
+        .items li {
+            width: 405px;
+            height: 405px;
+            display: none;
+            border: solid 1px #ddd;
+        }
+    </style>
+</head>
+<body>
+    <ul class='options'>
+        <li data-type="0" style='background-color: #25bb9b;'>题库</li>
+        <li data-type="1">面试</li>
+        <li data-type="2">学习</li>
+        <li data-type="3">求职</li>
+    </ul>
+    <ul class='items'>
+        <li style="display: block;">题库，包含编程题、选择题等</li>
+        <li>为你的面试提供一站式服务</li>
+        <li>校招学习来牛客</li>
+        <li>求职中有什么难题，可以联系我们</li>
+    </ul>
+
+    <script>
+        // var options = document.querySelector('.options');
+        // var optionItems = [].slice.call(document.querySelectorAll('.options li'));
+        // var items = [].slice.call(document.querySelectorAll('.items li'));
+        // optionItems.forEach(item => {
+        //     item.addEventListener('click',function(event){
+        //         // const target = event.target;
+        //         // console.log(target);
+        //         //首先清除全部背景，再给当前li添加背景
+        //         optionItems.forEach(ele => ele.style.backgroundColor = "");
+        //         this.style.backgroundColor = "#25bb9b";
+        //         //根据获取到的索引值确定显示哪个
+        //         items.forEach(item => item.style.display = 'none');
+        //         items[this.getAttribute('data-type')].style.display = 'block';
+                
+        //     });
+        // })
+        
+        //优化
+        var options = document.querySelector('.options');
+        var items = Array.from(document.querySelectorAll('.items li'));
+
+        options.addEventListener('click',function(event){
+            const target = event.target;
+            if(target.tagName === 'LI'){
+                Array.from(options.children).forEach(element => { element.style.backgroundColor = '' });
+                target.style.backgroundColor = '#25bb9b';
+                
+                items.forEach(item => item.style.display = 'none');
+                items[target.getAttribute('data-type')].style.display = 'block';
+            }
+        })
+
+        const arrlike = document.querySelectorAll('.items li');
+        console.log([].slice.call(arrlike));
+        //等价于
+        console.log(Array.from(arrlike));
+    </script>
+</body>
+</html>
