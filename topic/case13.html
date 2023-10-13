@@ -58,6 +58,11 @@
             return /([a-zA-Z])\1/.test(str);
         }
         console.log(reg("at3333"));
+
+        //查询字符串是否以元音字母结尾
+        function endsWithVowel(str) {
+            return /[a|e|i|u|A|E|I|O|U]$/.test(str);
+        }
     </script>
 </body>
 </html>

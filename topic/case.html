@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+
+        class Person {
+            #age;//定义私有字段
+            constructor(name, age) {
+                this.name = name;
+                this.#age = age;
+            }
+            getname() {
+                return this.name;
+            }
+            getage() {
+                return this.#age;
+            }
+        }
+        const jack = new Person("jack", 23);
+        console.log(jack.__proto__.hasOwnProperty("getname"));
+        console.log(jack.getname());
+        jack.name = "tom"; // name不是私有字段，可以在外部直接进行修改和访问
+        console.log(jack.name);
+
+        console.log(jack.age); // underfunded 外部无法直接访问和修改
+        console.log(jack.getage()); // 23 必须通过方法间接访问
+
+        // class Logger {
+        //     constructor() {
+        //         // this.printName = (name = 'there') => {
+        //         //     this.print(`Hello ${name}`);
+        //         // };
+        //         this.printName = function(name = "there"){
+        //             this.print(`Hello ${name}`);
+        //         }
+        //     }
+        //     print(){
+        //         console.log(this);
+        //         console.log(arguments[0]);
+        //     }
+        // }
+        // class Logger {
+        //     constructor() {
+        //         this.printName.bind(this);
+        //     }
+        //     printName() {
+        //         console.log('Logger');
+        //     }
+        // }
+
+        class Logger {
+            constructor() {
+                this.printName = function (name = 'there') {
+                    this.print(`Hello ${name}`);
+                };
+            }
+
+            print() {
+                console.log(this);
+                console.log(arguments[0]);
+            }
+        }
+        const log = new Logger();
+        const { printName } = log;
+        // printName();
+        // log.printName();
+        // print();
+    </script>
+
+</body>
+
+</html>
