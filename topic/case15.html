@@ -74,13 +74,51 @@
 
         // HTML模块为一个简化版的购物车，tbody为商品列表，tfoot为统计信息，
         // 系统会随机在列表中生成一些初始商品信息
-        // 1、请完成add函数，在列表后面显示items商品信息。参数items为{name: String, price: Number}组成的数组
+        // 1、请完成add函数，在列表后面显示items商品信息。
+        // 参数items为{name: String, price: Number}组成的数组
         // 2、请完成bind函数，点击每一行的删除按钮(包括通过add增加的行)，从列表中删除对应行
         // 3、请注意同步更新统计信息，价格保留小数点后两位
         // 4、列表和统计信息格式请与HTML示例保持一致
         // 5、不要直接手动修改HTML中的代码
-        // 6、不要使用第三方库        
+        // 6、不要使用第三方库  
+        const items = [{ name: "a", price: 12.12 }, { name: "b", price: 22.223 }, { name: "c", price: 13.14 }, { name: "d", price: 13 }];
 
+        let total = 0;
+        const tb = document.querySelector("tbody");
+        const tf = document.querySelector("tfoot");
+        function add(items) {
+            tb.innerHTML = items.map(ele => {
+                total += ele.price;
+                return `<tr>
+                            <td>${ele.name}</td>
+                            <td>${ele.price.toFixed(2)}</td>
+                            <td><a href="javascript:void(0);">删除</a></td>
+                        </tr>`;
+            }).join("");
+            tf.innerHTML = `<tr>
+                                <th>总计</th>
+                                <td colspan="2">${total.toFixed(2)}(${items.length}件商品)</td>
+                            </tr>`;
+        }
+        add(items);
+
+        function bind() {
+            const trArr = Array.from(document.querySelector("tbody").children);
+            const btnArr = Array.from(document.querySelectorAll("a"));
+            btnArr.forEach(item => {
+                item.addEventListener("click", (e) => {
+                    const target = e.target;
+                    target.parentElement.parentElement.remove();
+                    total = total - target.parentElement.parentElement.children[1].innerText;
+                    let count = tb.children.length;
+                    tf.innerHTML = `<tr>
+                                        <th>总计</th>
+                                        <td colspan="2">${total.toFixed(2)}(${count}件商品)</td>
+                                    </tr>`;
+                });
+            })
+        }
+        bind();
     </script>
 </body>
 
