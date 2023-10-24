@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双色球</title>
+    <style>
+        .main {
+            /* width: 500px;
+            height: 300px;
+            margin: 15vh auto; */
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main .balls {
+            width: 450px;
+            padding: 30px 10px 10px;
+            margin-bottom: 20px;
+            position: relative;
+            border-radius: 4px;
+        }
+
+        .main .balls:after {
+            content: '\20';
+            clear: both;
+            display: block;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .main .balls span {
+            position: absolute;
+            left: 12px;
+            top: 5px;
+            font-size: 13px;
+        }
+
+        .main b {
+            float: left;
+            width: 30px;
+            height: 30px;
+            font-size: 15px;
+            background: #FFF;
+            border: 1px solid;
+            border-radius: 50%;
+            line-height: 30px;
+            text-align: center;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .main .red .active {
+            background: #f56c6c;
+            color: #FFF;
+        }
+
+        .main .blue .active {
+            background: #3a8ee6;
+            color: #FFF;
+        }
+
+        .main .red {
+            background: #feeff0;
+        }
+
+        .main .red b {
+            border-color: #f56c6c;
+        }
+
+        .main .blue {
+            background: #ecf8ff;
+        }
+
+        .main .blue b {
+            border-color: #3a8ee6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <div class="balls red">
+            <span>红球</span>
+            <div class="balls-wp">
+                <b>01</b>
+                <b>02</b>
+                <b>03</b>
+                <b>04</b>
+                <b>05</b>
+                <b>06</b>
+                <b>07</b>
+                <b>08</b>
+                <b>09</b>
+                <b>10</b>
+                <b>11</b>
+                <b>12</b>
+                <b>13</b>
+                <b>14</b>
+                <b>15</b>
+                <b>16</b>
+                <b>17</b>
+                <b>18</b>
+                <b>19</b>
+                <b>20</b>
+                <b>21</b>
+                <b>22</b>
+                <b>23</b>
+                <b>24</b>
+                <b>25</b>
+                <b>26</b>
+                <b>27</b>
+                <b>28</b>
+                <b>29</b>
+                <b>30</b>
+                <b>31</b>
+                <b>32</b>
+                <b>33</b>
+            </div>
+        </div>
+        <div class="balls blue">
+            <span>蓝球</span>
+            <div class="balls-wp">
+                <b>01</b>
+                <b>02</b>
+                <b>03</b>
+                <b>04</b>
+                <b>05</b>
+                <b>06</b>
+                <b>07</b>
+                <b>08</b>
+                <b>09</b>
+                <b>10</b>
+                <b>11</b>
+                <b>12</b>
+                <b>13</b>
+                <b>14</b>
+                <b>15</b>
+                <b>16</b>
+            </div>
+        </div>
+        <button>点击进行选择</button>
+    </div>
+    <script>
+        // 双色球由33个红球和16个蓝球组成，1注双色球包括6个不重复的红球和1个蓝球。
+        // 请阅读给出的页面和代码，完成 randomFn 函数，实现“随机一注”功能，要求如下：
+        // 函数返回：
+        //   1.以字符串形式输出“随机一注”结果，选中的红蓝球用"|"隔开，红球在前，号码间用半角逗号隔开，如"06,10,13,18,23,27|05"
+        //   2.红球和蓝球号码排列顺序 需与页面展示的顺序对应
+        // 页面交互：
+        //   1.将选中的红球和蓝球（页面中对应DOM元素）用class="active"高亮
+        //   2.将选中的球按号码从小到大排列，移至所属组的前方，结果如示意图所示
+        //   3.每次执行 randomFn 函数，输出符合要求且不完全重复
+        function randomFn() {
+            // 随机选六个红球 保存在数组中并排序
+            const red = document.querySelector(".red .balls-wp").children;
+            const blue = document.querySelector(".blue .balls-wp").children;
+            const set = new Set();
+            while (set.size < 6) {
+                let num = Math.floor(Math.random() * (red.length - 1) + 1);
+                set.add(num);
+            }
+            const redArr = Array.from(set).sort((a, b) => a - b);;
+            // 随机选一个蓝球
+            let blueNum = Math.floor(Math.random() * (blue.length - 1) + 1);
+            // 选中的球高亮显示
+            Array.from(red).forEach(item => {
+                item.classList.remove("active");
+                if(redArr.includes(parseInt(item.innerText))) item.classList.add("active");
+            });
+            Array.from(blue).forEach(item => {
+                item.classList.remove("active");
+                if(parseInt(item.innerText) == blueNum) item.classList.add("active");
+            })
+        }
+        document.querySelector("button").addEventListener("click",() => randomFn());
+    </script>
+</body>
+
+</html>

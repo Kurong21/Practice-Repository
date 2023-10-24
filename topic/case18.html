@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>替换链接</title>
+    <style>
+        /* 填写样式 */
+        a {
+            color: #00bc9b;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="jsContainer">
+        这里会给出一段随机文本，可能包含一些链接，比如https://www.baidu.com，或者
+        www.baidu.com?from=onlineExam，如果出现链接文本，请给该链接文本加上链接标签，用户点击后能直接在新窗口中打开该链接。
+    </div>
+
+    <script>
+        // 页面中存在id=jsContainer的DOM元素。
+        // 该DOM元素内会给出一段随机文本，可能包含一些链接，比如https://www.baidu.com，或者 www.baidu.com?from=onlineExam，如果出现链接文本，请给该链接文本加上链接标签，用户点击后能直接在新窗口中打开该链接。
+        // 请完成 link 函数，完成该功能
+        // 1、container只有纯文本内容，不包含其他dom元素
+        // 2、识别所有以http://、https://或者www.开始的链接
+        // 3、所有www.开头的链接，默认使用 http 协议
+        // 4、所有链接在新窗口打开
+        function link() {
+            const text = document.querySelector("div");
+            const link = text.innerText;
+            const regexp = /(https?:\/\/)?(www\.\w+(\.(com|cn))*([?]\w+=\w*(&\w+=\w*)*)?(#\w+)?)/g;
+            const res = link.match(regexp);
+
+            // text.innerHTML = link.replace(regexp, ($1) => {
+            //     return `<a href="${$1}" target="_blank">${$1}</a>`;
+            // });
+            text.innerHTML = link.replace(regexp,function(...args){
+                if(args[1]) return `<a href="${args[0]}" target="_blank">${args[0]}</a>`;
+                else return `<a href="https://${args[0]}" target="_blank">${args[0]}</a>`
+            })
+        }
+        link();
+    </script>
+</body>
+
+</html>
