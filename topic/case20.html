@@ -171,14 +171,17 @@
             // 选中的球高亮显示
             Array.from(red).forEach(item => {
                 item.classList.remove("active");
-                if(redArr.includes(parseInt(item.innerText))) item.classList.add("active");
+                if (redArr.includes(parseInt(item.innerText))) item.classList.add("active");
             });
             Array.from(blue).forEach(item => {
                 item.classList.remove("active");
-                if(parseInt(item.innerText) == blueNum) item.classList.add("active");
+                if (parseInt(item.innerText) == blueNum) item.classList.add("active");
             })
         }
-        document.querySelector("button").addEventListener("click",() => randomFn());
+        document.querySelector("button").addEventListener("click", () => randomFn());
+
+
+        
     </script>
 </body>
 

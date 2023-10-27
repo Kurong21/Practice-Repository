@@ -30,6 +30,10 @@
             top: 39px;
         }
 
+        .hide {
+            display: none;
+        }
+
         .js-suggest.hide {
             display: none;
         }
@@ -83,20 +87,79 @@
         // 8、请不要手动修改html和css
         // 9、不要使用第三方插件
         // 10、请使用ES5语法
-        const items = ['不匹配数据', '根据输入框的值', '从给定字符串数组中筛选出匹配的数据，依次显示在li节点中', '如果没有匹配的数据，请移除所有li节点，并隐藏.js-suggest节点'];
+        // const items = ['北京', '北京大学', '北大', '大北京','天津'];
+        // const input = document.querySelector("input");
+        // const ul = document.querySelector("ul");
+        // const len = ul.children.length;
+        // const div = document.querySelector(".js-suggest");
+        // //隐藏所有li
+        // for (let i = 0; i < len; i++) {
+        //     ul.children[i].classList.add("hide");
+        // }
+        // //给input绑定事件
+        // input.addEventListener("change", () => suggest(items));
+        // function suggest(items) {
+        //     let value = input.value;
+        //     if (!value) div.classList.add("hide");
+
+        //     // 匹配特殊字符
+        //     const regexp = /[\(\)\.\,\:\;‘’、。，【】~·`\'\"\?\^\/\\\\\*\[\]\|\+\{\}\$￥&#@\!<>\%]/g;
+
+        //     if (regexp.test(value)) {
+        //         ul.innerHTML = `<li>输入内容不能包含特殊字符</li>`;
+        //     } else {
+        //         //匹配输入内容
+        //         let str = "";
+        //         let match = [];
+        //         value.split("").forEach(item => str += item + '.*?');
+        //         let reg = new RegExp(str);
+        //         for(let i of items){
+        //             if(reg.test(i)){
+        //                 match.push(i);
+        //                 ul.innerHTML = match.map(ele => {
+        //                     return `<li>${ele}</li>`;
+        //                 }).join("");
+        //             }
+        //         }
+        //     }
+
+        // }
+
+        const items = ['北京', '北京大学', '北大', '大北京', '天津'];
         const input = document.querySelector("input");
-        input.addEventListener("change", () => suggest(items));
-        function suggest(items) {
-            if(!input.value) document.querySelector(".js-suggest").classList.add("hide");
-            
-            document.querySelector("ul").innerHTML = items.map(item => {
-                let value = input.value.trim();
-                if(item == value) {
-                    return `<li>${item}</li>`;
-                }
-            }).join("");
+        const ul = document.querySelector("ul");
+        const div = document.querySelector(".js-suggest");
+
+        input.addEventListener("input", suggest);
+
+        function suggest() {
+            const value = input.value.trim(); // 移除输入两端的空格
+
+            if (!value) {
+                div.classList.add("hide");
+                ul.innerHTML = "";
+                return;
+            }
+
+            // 匹配特殊字符
+            const regexp = /[\(\)\.\,\:\;‘’、。，&#8203;``【oaicite:0】``&#8203;~·`\'\"\?\^\/\\\\\*\[\]\|\+\{\}\$￥&#@\!<>\%]/g;
+
+            if (regexp.test(value)) {
+                ul.innerHTML = `<li>输入内容不能包含特殊字符</li>`;
+                return;
+            }
+
+            const filteredItems = items.filter(item => item.includes(value));
+
+            if (filteredItems.length > 0) {
+                ul.innerHTML = filteredItems.map(item => `<li>${item}</li>`).join("");
+            } else {
+                ul.innerHTML = `<li>未找到匹配项</li>`;
+            }
+
+            div.classList.remove("hide");
         }
-        
+
     </script>
 </body>
 

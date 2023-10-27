@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分页</title>
+    <style>
+        .demo {
+            margin-bottom: 20px;
+            border: 1px solid #ebedf0;
+            border-radius: 2px;
+            padding: 10px;
+        }
+
+        .demo div {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .pagination {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            line-height: 1.5;
+            list-style: none;
+            display: inline-block;
+        }
+
+        .pagination.hide {
+            display: none;
+        }
+
+        .pagination li {
+            position: relative;
+            display: inline-block;
+            float: left;
+            height: 32px;
+            margin: 0;
+            padding: 0 15px;
+            line-height: 30px;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-top-width: 1.02px;
+            border-left: 0;
+            cursor: pointer;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .pagination li:first-child {
+            border-left: 1px solid #d9d9d9;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .pagination li:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+
+        .pagination li:first-child {
+            box-shadow: none !important;
+        }
+
+        .pagination li.current {
+            border-color: #1890ff;
+            color: #1890ff;
+            border-left: 1px solid #1890ff;
+        }
+
+        .pagination li.current:not(:first-child) {
+            margin-left: -1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div id="jsContainer">
+            <ul class="pagination">
+                <li>首页</li>
+                <li>8</li>
+                <li>9</li>
+                <li class="current">10</li>
+                <li>11</li>
+                <li>12</li>
+                <li>末页</li>
+            </ul>
+        </div>
+
+        <div class="demo">
+            <div>(Demo1) total: 10，current: 4</div>
+            <ul class="pagination">
+                <li>首页</li>
+                <li>2</li>
+                <li>3</li>
+                <li class="current">4</li>
+                <li>5</li>
+                <li>6</li>
+                <li>末页</li>
+            </ul>
+        </div>
+
+        <div class="demo">
+            <div>(Demo2) total: 0，current: 0</div>
+            <ul class="pagination hide"></ul>
+        </div>
+
+        <div class="demo">
+            <div>(Demo3) total: 3，current: 2</div>
+            <ul class="pagination">
+                <li>1</li>
+                <li class="current">2</li>
+                <li>3</li>
+            </ul>
+        </div>
+
+        <div class="demo">
+            <div>(Demo4) total: 10，current: 2</div>
+            <ul class="pagination">
+                <li>1</li>
+                <li class="current">2</li>
+                <li>3</li>
+                <li>4</li>
+                <li>5</li>
+                <li>末页</li>
+            </ul>
+        </div>
+
+        <div class="demo">
+            <div>(Demo5) total: 10，current: 9</div>
+            <ul class="pagination">
+                <li>首页</li>
+                <li>6</li>
+                <li>7</li>
+                <li>8</li>
+                <li class="current">9</li>
+                <li>10</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        // 本题展示了一个分页组件，界面中存在id=jsContainer的节点A，系统会随机实例化各种Pagination实例，请按照如下要求补充完成Pagination函数。
+        // 1、最多连续显示5页，居中高亮显示current页（如demo1所示)
+        // 2、total <= 1 时，隐藏该组件（如demo2所示）
+        // 3、如果total<=5，则显示全部页数，隐藏“首页”和“末页”元素（如demo3所示）
+        // 4、当current居中不足5页，向后(前)补足5页，隐藏“首页”(“末页”)元素(如demo4和demo5所示)
+        // 5、total、current均为正整数，1 <= current <= total
+        // 6、当前界面中，节点A为系统执行 new Pagination(节点A，20, 10) 后的展示效果
+        // 7、请不要手动修改html和css
+        // 8、不要使用第三方插件
+        function Pagination(container, total, current) {
+            this.total = total;
+            this.current = current;
+            this.html = html;
+            this.val = val;
+            this.el = document.createElement("ul"); //TODO: 创建分页组件根节点
+            if (!this.el) return;
+
+            this.el.innerHTML = this.html();
+            container.appendChild(this.el);
+            this.el.className = this.total <= 1 ? "pagination hide" : "pagination"; //TODO: 判断是否需要隐藏当前元素
+
+            function html() {
+                if (this.total <= 1) return;
+
+                //TODO: 生成组件的内部html字符串
+                let li = "";
+                if (total <= 5) {
+                    for (let i = 1; i <= total; i++) {
+                        li += `<li class=${i == current ? "current" : ""}>${i}</li>`;
+                    }
+                    return li;
+                } else {
+                    // 确定左右边界
+                    let left = Math.max(this.current - 2, 1);
+                    let right = Math.min(this.current + 2, total);
+
+
+                    // right-left < 4的时候表示 current 居中不足五页 需要补足五页
+                    if (right - left < 4) {
+                        left === 1 ? right++ : left--;
+                        for (let i = left; i <= right; i++) {
+                            li += `<li class=${i == this.current ? "current" : ""}>${i}</li>`;
+                        }
+                        li = `${left != 1 ? "<li>首页</li>" : ""}${li}${left == 1 ? "<li>末页</li>" : ""}`;
+                        return li;
+                    } else {
+                        // right-left = 4的时候表示 current居中显示 直接渲染五页
+                        li += `<li>首页</li>`;
+                        for (let i = left; i <= right; i++) {
+                            li += `<li class=${i == this.current ? "current" : ""}>${i}</li>`;
+                        }
+                        li += `<li>末页</li>`;
+                        return li;
+                    }
+                }
+
+            }
+
+            function val(current) {
+                if (arguments.length === 0) return this.current;
+                if (current < 1 || current > this.total || current === this.current) return;
+                this.current = current;
+                this.el.innerHTML = this.html();
+            };
+        }
+
+        const pagination = new Pagination(document.querySelector("#jsContainer"), 10, 1);
+    </script>
+</body>
+
+</html>
