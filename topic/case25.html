@@ -38,52 +38,25 @@
             // 6、返回结果中的标签名称不区分大小写
             // 7、如果节点不包含属性值或者子节点，
             // 其对应的结果中需要保留attributes以及children字段，例如 {tag: 'div', attributes: {}, children: []}
-            // function dom2json() {
-
-            //     // 先处理父节点
-            //     const node = document.getElementById("jsParent").parentNode;
-            //     function parse(node) {
-            //         // 创建一个json对象
-            //         const json = {
-
-            //         }
-            //         // 判断节点类型
-            //         if (node.nodeType == 3) return json.children.push({ tag: node.nodeName, content: node.nodeValue });
-            //         else {
-            //             // 添加属性
-            //             const attr = node.getAttributeNames().reduce((a, b) => {
-            //                 a[b] ? 0 : a[b] = node.getAttribute(b);
-            //                 return a;
-            //             }, {});
-            //             json.attributes = attr;
-
-            //             // 处理后代元素
-            //             if (node.hasChildNodes()) {
-            //                 for (let i = 0, len = node.children.length; i < len; i++) {
-            //                     const parentChild = Array.from(node.hasChildNodes)[i];
-            //                     const child = parse(parentChild);
-            //                     json.children.push(child);
-            //                 }
-            //             }
-            //             return json;
-            //         };
-            //     }
-            //     return parse(node);
-            // }
-            // console.log(dom2json());
 
 
-            function virtualDom() {
+            function dom2json() {
                 const node = document.getElementById("jsParent").parentNode;
-                // 创建空对象
-                const json = {};
 
                 function parse(node) {
+
+                    // 创建空对象
+                    const json = {};
+
                     // 设置tag
                     // json.tag = node.nodeName == "#text" && node.nodeValue != '' ? node.nodeValue.tirm() : 'text';
                     if (node.nodeType == 3) {
-                        json.children.push({ tag: node.nodeName.replace("#", ""), content: node.nodeValue.trim() });
+                        json.tag = node.nodeName.toLowerCase().replace("#", "");
+                        json.content = node.data.trim();
+                    } else {
+                        json.tag = node.nodeName.toLowerCase();
                     }
+                    // console.log(json);
                     // 设置attributes
                     json.attributes = {};
                     if (node.childNodes.length) {
@@ -95,14 +68,14 @@
 
                     // 后代
                     json.children = [];
-                    if (node.hasChildNodes) {
-                        for (let i = 0; i < node.childNodes.length; i++) {
-                            console.log(node.childNodes);
-                            Array.from(node.childNodes).filter(item => {
-                                return item ? item.nodeValue.trim() : 0;
-                            })
-                            const parentChild = node.childNodes[i];
-                            console.log(parentChild);
+                    if (node.hasChildNodes()) {
+
+                        // 过滤掉值为"" 或者
+                        const result = Array.from(node.childNodes).filter(item => {
+                            return item.nodeName == '#text' && item.data.trim() != '' || item.nodeName != '#text';
+                        });
+                        for (let i = 0; i < result.length; i++) {
+                            const parentChild = result[i];
                             const child = parse(parentChild);
                             json.children.push(child);
                         }
@@ -113,7 +86,7 @@
                 return parse(node);
             }
 
-            console.log(virtualDom());
+            console.log(dom2json());
         </script>
     </body>
 
