@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <ul></ul>
+    <script type="text/javascript">
+        var A = {
+            name: '张三',
+            f: function () {
+                console.log('姓名：' + this.name);
+            }
+        };
+
+        var B = {
+            name: '李四'
+        };
+
+        B.f = A.f;
+        B.f()   //李四
+        A.f()   //张三
+
+        function foo() {
+            console.log(this.a);
+        }
+        var obj2 = {
+            a: 2,
+            fn: foo
+        };
+        var obj1 = {
+            a: 1,
+            o1: obj2
+        };
+        obj1.o1.fn(); //2
+        console.log(obj1.o1);
+        obj1 = {
+            a:1,
+            o1:{
+                a:2,
+                fn:function foo(){
+                    console.log(this.a);
+                }
+            }
+        }
+
+        var o = {
+            a:10,
+            b:{
+                a:12,
+                fn:function(){
+                    console.log(this.a); 
+                    console.log(this); 
+                }
+            }
+        }
+        var j = o.b.fn;
+        console.log(o.b.fn);
+        j(); //undefined window
+
+        var x = 3;
+        var y = 4;
+        var obj = {
+            x: 1,
+            y: 6,
+            getX: function() {
+                var x =5;
+                return function() {
+                    return this.x;
+                };
+            },
+            getY: function() {
+                var y =7;
+                return this.y;
+            }
+        }
+        console.log(obj.getX()()) //3
+        console.log(obj.getY()) //6
+
+        var name="the window";
+
+        var object={
+            name:"My Object", 
+            getName:function(){ 
+                return this.name;
+            }
+        }
+
+        console.log(object.getName());   // My Object
+
+        console.log((object.getName)());  // My Object
+
+        console.log((object.getName=object.getName)());  // the window
+
+        var name = 222;
+        var a = {
+        name: 111,
+        say: function () {
+            console.log(this.name);
+        },
+        };
+        var fun = a.say;
+        fun(); //222   fun.call(window)
+        a.say(); //111  a.say.call(a)
+
+        var b = {
+        name: 333,
+        say: function (fun) {
+            fun();
+        },
+        };
+        b.say(a.say); //222
+        //相当于
+        // b.say(function () {
+        //     console.log(this.name);
+        // });
+        //转换
+        // var a = function(){
+        //     return function () {
+        //         console.log(this.name);
+        //     };
+        // }
+
+        // console.log(a());
+        //相当于在全局执行
+        //ƒ () {
+        //    console.log(this.name);//222
+        //  }
+        b.say = a.say; 
+        b.say(); //333
+
+
+
+        class Example {
+            constructor() {
+                const proto = Object.getPrototypeOf(this);
+                console.log(proto);
+                // console.log(Object.getOwnPropertyNames(proto));
+            }
+            first(){}
+            second(){}
+            static third(){}
+        }
+        var e= new Example();
+        console.log(e.__proto__);
+
+        const o2 = {
+            prop:37,
+            b:{
+                g: function(){
+                    return this.prop;
+                }, 
+                prop: 42 
+            }
+        }
+
+        console.log(o2.b.g()); // this指向o.b
+
+        p = {
+            a: 1,
+            b: 4,
+            f: function(){
+                return this.a + this.b;
+            }
+        }
+        console.log(p.f()); //5
+
+        class Car {
+            constructor() {
+                // Bind sayBye but not sayHi to show the difference
+                this.sayBye = this.sayBye.bind(this); //this永远绑定到car上面
+            }
+            sayHi() {
+                console.log(`Hello from ${this.name}`);
+            }
+            sayBye() {
+                console.log(`Bye from ${this.name}`);
+            }
+            get name() {
+                return 'Ferrari';
+            }
+        }
+
+        class Bird {
+            get name() {
+                return 'Tweety';
+            }
+        }
+
+        const car = new Car();
+        const bird = new Bird();
+
+        // The value of 'this' in methods depends on their caller
+        car.sayHi(); // Hello from Ferrari
+        bird.sayHi = car.sayHi;
+        bird.sayHi(); // Hello from Tweety
+
+        // For bound methods, 'this' doesn't depend on the caller
+        bird.sayBye = car.sayBye;
+        bird.sayBye();  // Bye from Ferrari
+
+
+        //九九乘法表
+        let array = new Array(10);
+        for(var i = 0;i < array.length;i++){
+            array[i] = new Array(10);
+            for(var j = 0;j < array[i].length;j++){
+                array[i][j] = i * j;
+            }
+            // array[i].splice(0,1);
+            array[i] = array[i].filter(item => item != 0);
+        }
+        array = array.filter(item => item != 0);
+        console.log(array);
+        console.log(array[3][6]);
+        const arr6 = [1, 9, 3, 2, 4, 'a', 'b', 5, 6];
+        const ul = document.querySelector('ul');
+        ul.innerHTML = arr6.map(item => {
+            return `<li>${item}</li>`;
+        }).join("");
+
+        // const myArray = ["a", "b", "a", "b", "c", "e", "e", "c", "d", "d", "d", "d"];
+        // const myArrayWithNoDuplicates = myArray.reduce((accumulator, currentValue) => {
+        // if (!accumulator.includes(currentValue)) {
+        //     return [...accumulator, currentValue];
+        // }
+        // return accumulator;
+        // }, []);
+
+        // console.log(myArrayWithNoDuplicates);
+        const arr = [1,2,3,4,5,3,4,5]
+        // const noarr = arr.reduce((prev,curl) => {
+        //     if(!prev.includes(curl)){
+        //         return [...prev,curl] 
+        //     }else{
+        //         return [...prev];
+        //     } 
+        // },[])
+        // Array.from(new Set(arr));
+        const set = new Set();
+        arr.forEach(item => set.add(item));
+        const myarr = Array.from(set);
+        // const myarr = Array.from(new Set(arr));
+        console.log(myarr);
+
+
+        const names = ["Alice", "Bob", "Tiff", "Bruce", "Alice"];
+        const countedNames = names.reduce((allnames,name) => {
+            var count = allnames[name] ?? 0;
+            return {
+                ...allnames,
+                [name]: count + 1
+            }
+        },{})
+        console.log(countedNames);
+        const people = [
+            { name: "Alice", age: 21 },
+            { name: "Max", age: 20 },
+            { name: "Jane", age: 20 },
+        ];
+
+        function groupBy(objectArray, property) {
+            return objectArray.reduce((acc, obj) => {
+                const key = obj[property];
+                const curGroup = acc[key] ?? [];
+
+                return { ...acc, [key]: [...curGroup, obj] };
+            }, {});
+        }
+
+        const groupedPeople = groupBy(people, "age");
+        console.log(groupedPeople);
+        
+
+        const numbers = [-5, 6, 2, 0];
+        const doubledPositiveNumbers = numbers.reduce((accumulator,currentValue) => {
+            if(currentValue > 0){
+                const double = currentValue * 2;
+                return [...accumulator,double];
+            }
+            return accumulator;
+        },[]);
+        console.log(doubledPositiveNumbers);
+
+
+        function Furilt(type){
+            this.type = type;
+            // function get(){
+            //     console.log(type);
+            // }
+        }
+        Furilt.prototype.get = function(type){
+            console.log(type);
+        }
+        const bannana = new Furilt("hot");
+        console.log(bannana.get("hot"));
+
+        
+    </script>
+</body>
+</body>
+</html>

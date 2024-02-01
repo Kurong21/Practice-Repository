@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>枚举表示扑克牌</title>
+</head>
+<body>
+    <script>
+
+        //定义一个表示一张扑克牌花色和字数的类
+        class Card{
+            constructor(suit,rank){
+                this.suit = suit;
+                this.rank = rank;
+            }
+            toString(){
+                return `${this.rank} of ${this.suit}`
+            }
+        }
+        //定义一个表示一副扑克牌花色和字数的类
+        class DeckCard{
+            constructor(){
+                //定义空数组表示一副牌
+                this.cards = [];
+                //花色
+                const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+                //字数
+                const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
+                //给每一张扑克牌添加花色和字数，并添加到定义的一副牌中。
+                for(var suit of suits){
+                    for(var rank of ranks){
+                        this.cards.push(new Card(suit,rank));
+                    }
+                }
+            }
+            
+            //定义一个发牌的方法
+            deal(n){
+                if(this.cards.length < n){
+                    return '牌堆中没有足够多的牌了';
+                }else{
+                    return this.cards.splice(this.cards.length - n,n);
+                }
+            }
+
+            //定义一个洗牌的方法
+            shuffle(){
+                let desc = this.cards,len = desc.length;
+                for(var i = 1;i < len;i++){
+                    var r = Math.floor(Math.random() * (i + 1));
+                    var temp;
+                    temp = desc[i];
+                    desc[i] = desc[r];
+                    desc[r] = temp;
+                }
+                return desc;
+            }
+        }
+        //创建牌组
+        const puke = new DeckCard();
+        console.log(puke.cards);
+        //洗牌
+        puke.shuffle();
+        //发牌
+        console.log(puke.deal(3));
+        console.log(puke.deal(3));
+        console.log(puke.deal(3));
+        
+        //创建新的牌组并洗牌
+        if(puke.cards.length < 9){
+            console.log("牌不够了，换一副");
+            const puke2 = new DeckCard();
+            console.log(puke2.shuffle());
+        }else{
+            //查看牌
+            console.log(puke.deal(3)[1].toString());
+        }
+        console.log(a);
+        var a = 3;
+    </script>
+</body>
+</html>

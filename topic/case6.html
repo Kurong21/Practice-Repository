@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        function array(a,n){
+            return Array.prototype.slice.call(a,n || 0);
+        }
+        // function compose(f,g){
+        //     return function(){
+        //         return f.apply(this,g.apply(this,arguments));
+        //     }
+        // }
+        function square(x,y){
+            console.log(array(arguments));
+            return x * y;
+        }
+        console.log(square(1,2));
+        function sum(x,y){
+            return [x,y];
+        }
+        // var res = compose(square,sum);
+        // console.log(res(2,3));
+
+        function f(x,y){
+            return x + y;
+        }
+        function partialLeft(f /*,...*/){
+            var arg = arguments;
+            console.log(arg);
+            return function(){
+                var a = array(arg,1);
+                a = a.concat(array(arguments));
+                return f.apply(this,a);
+            }   
+        }
+        var result = partialLeft(f(2,3));
+        console.log(result());
+    </script>
+</body>
+</html>

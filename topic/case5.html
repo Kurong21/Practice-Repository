@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成随机字符串</title>
+</head>
+<body>
+    
+    <script>
+
+        function randomString(e){
+            e = e || 8;
+            const str = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz";
+            let n = "";
+            for(var i = 0;i < e;i++){
+                n += str.charAt(Math.floor(Math.random() * str.length));
+            }
+            return n;
+        }
+        let set = new Set();
+        while(set.size < 20){
+            set.add(randomString(8));
+        }
+        console.log(Array.from(set));
+    </script>
+
+</body>
+</html>

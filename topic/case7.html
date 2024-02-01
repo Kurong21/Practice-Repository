@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据提取</title>
+</head>
+<body>
+    <script>
+
+        var data = [
+            {
+                name: "Jamestown",
+                population: 2047,
+                temperatures: [-34, 67, 101, 87]
+            },
+            {
+                name: "Awesome Town",
+                population: 3568,
+                temperatures: [-3, 4, 9, 12]
+            },
+            {
+                name: "Funky Town",
+                population: 1000000,
+                temperatures: [75, 75, 75, 75, 75]
+            }
+        ];
+        //计算温度平均数的 纯函数      
+        function average(arr){
+            return arr.reduce((acc,cur) => acc + cur) / arr.length;
+        }
+        //得到人口和温度的数组
+        function compose(arr){
+            let result = [];
+            arr.forEach(item => {
+                let res = [];
+                res.push(item.population);
+                res.push(average(item.temperatures));
+                result.push(res);
+            });
+            return result;
+        }
+        console.log(compose(data));
+    </script>
+</body>
+</html>

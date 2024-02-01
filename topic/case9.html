@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script>
+
+        function Range(from,to){
+            this.from = from;
+            this.to = to;
+        }
+
+        Range.prototype = {
+            includes:function(x){
+                return this.from <= x && x <= this.to; 
+            },
+            foreach:function(){
+                for(var i = this.from;i < this.to;i++) return i;
+            },
+            tostring:function(){
+                return `(${this.from}...${this.to})`;
+            }
+        }
+
+        const range = new Range(1,5);
+        console.log(range.includes(4));
+        console.log(range.foreach());
+        console.log(range.tostring());
+
+        const array1 = ['1','3','5','6'];
+        const res = array1.map(parseInt);
+        console.log(res);
+
+        const anonymousFunction = function() {
+            // 函数体
+        };
+
+        console.log(anonymousFunction.name);
+        console.log(new Function().name);
+    </script>
+
+</body>
+</html>

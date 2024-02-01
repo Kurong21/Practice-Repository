@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>虚拟DOM</title>
+</head>
+
+<body>
+    <script>
+        var vnode = {
+            tag: 'ul',
+            props: {
+                class: 'list',
+                id: 1
+            },
+            text: '',
+            children: [
+                {
+                    tag: "li",
+                    props: {
+                        class: "item"
+                    },
+                    text: '',
+                    children: [
+                        {
+                            tag: undefined,
+                            props: {},
+                            text: '牛客网',
+                            children: []
+                        }
+                    ]
+                },
+                {
+                    tag: "li",
+                    props: {},
+                    text: '',
+                    children: [
+                        {
+                            tag: undefined,
+                            props: {},
+                            text: 'newCoder',
+                            children: []
+                        }
+                    ]
+                }
+            ]
+        }
+        const _createElm = vnode => {
+            let el = 0;
+            const { tag, props, children, text } = vnode;
+            if (typeof tag == 'string') {
+                el = document.createElement(tag);
+                for (i in props) {
+                    if (props.hasOwnProperty(i)) el.setAttribute(i, props[i]);
+                }
+                if (children.length > 0) children.forEach(child => el.appendChild(_createElm(child)));
+                return el;
+            } else return document.createTextNode(text || '');
+
+        }
+
+        console.log(_createElm(vnode));
+    </script>
+</body>
+
+</html>

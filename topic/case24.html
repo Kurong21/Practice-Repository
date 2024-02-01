@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动控制</title>
+    <style>
+        table.game {
+            font-size: 14px;
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        table.game td {
+            border: 1px solid #e1e1e1;
+            padding: 0;
+            height: 30px;
+            text-align: center;
+        }
+
+        table.game td.current {
+            background: #1890ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="jsContainer">
+        <table class="game">
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="current"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        // 界面中存在id=jsContainer的节点A，系统会随机生成id为jsLayout的 m行 x n列 表格(m >= 1, n >= 1)，并随机选中一个td节点，请按照如下需求实现bind函数
+        // 1、bind 函数为document绑定keydown事件，当系统触发上(键值38)下(键值40)左(键值37)右(键值39)按键时，请找到当前选中的td节点，并根据当前指令切换高亮节点，具体效果参考以下图片
+        // 2、在第一列往左移动则到达最后一列；在最后一列往右移动则到达第一列；在第一行往上移动则到达最后一行；在最后一行往下移动则到达第一行；
+        // 3、请不要手动调用bind函数
+        // 4、当前界面为系统在节点A中生成 9 * 9 表格并随机选中一个td节点后的效果
+        // 5、请不要手动修改html和css，请不要修改js中的事件绑定方式
+        // 6、不要使用第三方插件
+        // function bind() {
+
+        //     document.onkeydown = event => {
+        //         if (!event) return;
+        //         var code = event.keyCode || '';
+        //         if (!{ '37': 1, '38': 1, '39': 1, '40': 1 }[code]) return;
+        //         event.preventDefault && event.preventDefault();
+        //         //TODO: 请实现按键控制
+        //         const td = Array.from(document.querySelectorAll("td"));
+        //         const current = document.querySelector(".current");
+        //         const curIndex = td.indexOf(current) + 1;
+        //         console.log(curIndex);
+
+        //         let tarIndex = 0;
+        //         switch (code) {
+        //             // 左
+        //             case 37:
+        //                 let n = 1;
+        //                 current.className = "";
+        //                 tarIndex = { '1': 1, '10': 1, '19': 1, '28': 1, '37': 1, '46': 1, '55': 1, '64': 1, '73': 1 }[curIndex] ? curIndex + 7 : curIndex - 2;
+        //                 td[tarIndex].className = "current";
+        //                 break;
+        //             // 上
+        //             case 38:
+        //                 current.className = "";
+        //                 tarIndex = (1 <= curIndex && curIndex <= 9) ? curIndex + 71 : curIndex - 10;
+        //                 td[tarIndex].className = "current";
+        //                 break;
+        //             // 右
+        //             case 39:
+        //                 current.className = "";
+        //                 tarIndex = curIndex % 9 == 0 ? curIndex - 9 : curIndex;
+        //                 td[tarIndex].className = "current";
+        //                 break;
+        //             // 下
+        //             case 40:
+        //                 current.className = "";
+        //                 tarIndex = (73 <= curIndex && curIndex <= 81) ? curIndex - 73 : curIndex + 8;
+        //                 td[tarIndex].className = "current";
+        //                 break;
+        //         }
+
+        //     };
+        // }
+        // bind();
+
+        function move() {
+            document.addEventListener("keydown", (event) => {
+                if (!event) return;
+                var code = event.keyCode || '';
+                if (!{ '37': 1, '38': 1, '39': 1, '40': 1 }[code]) return;
+                event.preventDefault && event.preventDefault();
+
+                //  获取元素
+                const tr = document.querySelectorAll("tr");
+                const current = document.querySelector(".current");
+
+                // 计算当前所在的行和列
+                let curRow = 0;
+                let curCol = 0;
+                for (let i = 0, len = tr.length; i < len; i++) {
+                    for (let j = 0, len = tr[i].children.length; j < tr[i].children.length; j++) {
+                        if (tr[i].children[j].className == 'current') {
+                            curRow = i;
+                            curCol = j;
+                        }
+                    }
+                }
+
+                // 清除上一次选中的样式
+                current.className = '';
+
+                // 控制移动
+                switch (code) {
+                    // 左移
+                    case 37:
+                        tr[curRow].children[curCol == 0 ? tr[0].children.length - 1 : --curCol].className = 'current';
+                        break;
+                    case 38:
+                    // 上移
+                        tr[curRow == 0 ? tr.length - 1 : --curRow].children[curCol].className = 'current';
+                        break;
+                    // 右移
+                    case 39:
+                        tr[curRow].children[curCol == tr[0].children.length - 1 ? 0 : ++curCol].className = 'current';
+                        break;
+                    // 下移
+                    case 40:
+                        tr[curRow == tr.length - 1 ? 0 : ++curRow].children[curCol].className = 'current';
+                        break;
+                }
+            })
+        }
+        move();
+    </script>
+</body>
+
+</html>

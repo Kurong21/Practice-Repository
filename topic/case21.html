@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能提示</title>
+    <style>
+        .search {
+            position: relative;
+        }
+
+        .js-input {
+            width: 450px;
+            height: 22px;
+            line-height: 22px;
+            font-size: 16px;
+            padding: 8px;
+            border: 1px solid #cccccc;
+            outline: none;
+        }
+
+        .js-suggest {
+            width: 466px;
+            font-size: 14px;
+            border: 1px solid #cccccc;
+            background: #ffffff;
+            position: absolute;
+            left: 0;
+            top: 39px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .js-suggest.hide {
+            display: none;
+        }
+
+        .js-suggest ul {
+            display: block;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .js-suggest ul li {
+            color: #000;
+            font: 14px arial;
+            line-height: 25px;
+            padding: 0 8px;
+            position: relative;
+            cursor: default;
+        }
+
+        .js-suggest ul li:hover {
+            background: #f0f0f0;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="search">
+        <div><input type="text" class="js-input" value="的"></div>
+        <div class="js-suggest">
+            <ul>
+                <li>不匹配数据</li>
+                <li>根据输入框的值</li>
+                <li>从给定字符串数组中筛选出匹配的数据，依次显示在li节点中</li>
+                <li>如果没有匹配的数据，请移除所有li节点，并隐藏.js-suggest节点</li>
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript">
+        // 本题展示了一个简化版的搜索框智能提示功能，请按照如下要求完成suggest函数。
+        // 1、当输入框的值发生变化时，系统会调用suggest函数，用于显示/隐藏智能提示数据，参数items为一个字符串数组。
+        // 2、当items中的字符串和输入框的值匹配时，将匹配的数据依次渲染在ul下的li节点中，并显示.js-suggest节点，否则移除ul下的所有li节点，
+        // 并隐藏.js-suggest节点
+        // 3、输入框的值需要移除两侧空白再进行匹配
+        // 4、输入框的值为空时，按照全部不匹配处理
+        // 5、字符串使用模糊匹配，比如"北大"能匹配"北大"和"北京大学"，但不能匹配"大北京"，即按照 /北.*?大.*?/ 这个正则进行匹配
+        // 6、通过在.js-suggest节点上添加/移除 hide 这个class来控制该节点的隐藏/显示
+        // 7、当前界面是执行 suggest(['不匹配数据', '根据输入框的值', '从给定字符串数组中筛选出匹配的数据，依次显示在li节点中', 
+        // '如果没有匹配的数据，请移除所有li节点，并隐藏.js-suggest节点']) 后的结果
+        // 8、请不要手动修改html和css
+        // 9、不要使用第三方插件
+        // 10、请使用ES5语法
+        // const items = ['北京', '北京大学', '北大', '大北京','天津'];
+        // const input = document.querySelector("input");
+        // const ul = document.querySelector("ul");
+        // const len = ul.children.length;
+        // const div = document.querySelector(".js-suggest");
+        // //隐藏所有li
+        // for (let i = 0; i < len; i++) {
+        //     ul.children[i].classList.add("hide");
+        // }
+        // //给input绑定事件
+        // input.addEventListener("change", () => suggest(items));
+        // function suggest(items) {
+        //     let value = input.value;
+        //     if (!value) div.classList.add("hide");
+
+        //     // 匹配特殊字符
+        //     const regexp = /[\(\)\.\,\:\;‘’、。，【】~·`\'\"\?\^\/\\\\\*\[\]\|\+\{\}\$￥&#@\!<>\%]/g;
+
+        //     if (regexp.test(value)) {
+        //         ul.innerHTML = `<li>输入内容不能包含特殊字符</li>`;
+        //     } else {
+        //         //匹配输入内容
+        //         let str = "";
+        //         let match = [];
+        //         value.split("").forEach(item => str += item + '.*?');
+        //         let reg = new RegExp(str);
+        //         for(let i of items){
+        //             if(reg.test(i)){
+        //                 match.push(i);
+        //                 ul.innerHTML = match.map(ele => {
+        //                     return `<li>${ele}</li>`;
+        //                 }).join("");
+        //             }
+        //         }
+        //     }
+
+        // }
+
+        const items = ['北京', '北京大学', '北大', '大北京', '天津'];
+        const input = document.querySelector("input");
+        const ul = document.querySelector("ul");
+        const div = document.querySelector(".js-suggest");
+
+        input.addEventListener("input", suggest);
+
+        function suggest() {
+            const value = input.value.trim(); // 移除输入两端的空格
+
+            if (!value) {
+                div.classList.add("hide");
+                ul.innerHTML = "";
+                return;
+            }
+
+            // 匹配特殊字符
+            const regexp = /[\(\)\.\,\:\;‘’、。，&#8203;``【oaicite:0】``&#8203;~·`\'\"\?\^\/\\\\\*\[\]\|\+\{\}\$￥&#@\!<>\%]/g;
+
+            if (regexp.test(value)) {
+                ul.innerHTML = `<li>输入内容不能包含特殊字符</li>`;
+                return;
+            }
+
+            const filteredItems = items.filter(item => item.includes(value));
+
+            if (filteredItems.length > 0) {
+                ul.innerHTML = filteredItems.map(item => `<li>${item}</li>`).join("");
+            } else {
+                ul.innerHTML = `<li>未找到匹配项</li>`;
+            }
+
+            div.classList.remove("hide");
+        }
+
+    </script>
+</body>
+
+</html>
