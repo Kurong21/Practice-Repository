@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件处理</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+
+<body>
+
+    <div id="app1">
+        <button v-on:click="count++">点击增加{{ count }}</button>
+    </div>
+
+    <div id="app2">
+        <button v-on:click="showMsg">Greet</button>
+    </div>
+
+    <div id="app3">
+        <button v-on:click="showMsg('Hi Vue')">Greet</button>
+        <button v-on:click="showMsg('Hi Vue',$event)">Greet</button>
+    </div>
+
+    <div id="app4">
+        <input type="text" v-model="msg" placeholder="Edit me">
+        <p>This message is {{ msg }}</p>
+    </div>
+
+    <div id="app5">
+        <textarea type="text" v-model="msg" placeholder="add multiple lines"></textarea>
+        <p style="white-space: pre-line;">This message is {{ msg }}</p><br>
+    </div>
+
+    <div id="app6">
+        <input type="checkbox" value="Jack" v-model="checkedNames">
+        <label for="check">Jack</label>
+
+        <input type="checkbox" value="john" v-model="checkedNames">
+        <label for="check">john</label>
+
+        <input type="checkbox" value="mike" v-model="checkedNames">
+        <label for="check">mike</label>
+        <span>Checked names: {{ checkedNames }}</span>
+    </div>
+
+    <div id="app7">
+        <input type="radio" id="Jack" value="Jack" v-model="picked">
+        <label for="check">Jack</label>
+
+        <input type="radio" id="Mike" value="Mike" v-model="picked">
+        <label for="check">Mike</label><br>
+        <span>Picked: {{ picked }}</span>
+    </div>
+
+    <div id="app8">
+        <select name="test" id="select" v-model="value">
+            <option disabled value="">请选择</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+        </select>
+        <span>Selected: {{ value }}</span>
+    </div>
+
+    <div id="app9">
+        <select name="multiple" id="select" multiple v-model="groups">
+            <option>AAA</option>
+            <option>BBB</option>
+            <option>CCC</option>
+        </select>
+        <span>Selected: {{ groups }}</span>
+    </div>
+
+    <div id="app10">
+        <select id="dynamic" v-model="selected">
+            <option v-for="item in items" v-bind:value="item">{{ item }}</option>
+        </select>
+        <span>You has selected: {{ selected }}</span>
+    </div>
+
+    <!-- 把值绑定到 Vue 实例的一个动态 property 上，这时可以用 v-bind 实现，并且这个 property 的值可以不是字符串。 -->
+    <div id="app11">
+        <input type="text" :[key]="value">
+        <span>输入的内容: {{ value }}</span>
+    </div>
+
+    <script>
+        // 使用v-on监听DOM事件 在触发时运行一些js代码 简写 @ + 事件名 如 @click
+        const app1 = new Vue({
+            el: "#app1",
+            data: {
+                count: 0
+            }
+        });
+
+        // 事件处理方法 较为复杂的逻辑 不应直接放在v-on指令中 所以应该定义一个可以调用的方法
+        const app2 = new Vue({
+            el: "#app2",
+            data: {
+                msg: "Hello Vue!!!"
+            },
+            methods: {
+                showMsg: function (event) {
+                    alert(this.msg);
+                    if (event) {
+                        alert(event.target.tagName);
+                    }
+                }
+            }
+        });
+        // 直接调用
+        // app2.showMsg();
+
+        // 内联处理器中的方法  在内联语句中访问原始的DOM事件 使用特殊的变量 $event 传入方法
+        const app3 = new Vue({
+            el: "#app3",
+            data: {
+                msg: "Hello Vue!!!"
+            },
+            methods: {
+                showMsg: function (msg) {
+                    // alert(msg);
+                    // 在内部访问原生事件对象
+                    if (event) {
+                        event.preventDefault();  // 阻止了事件默认行为
+                    } else {
+                        alert(msg);
+                    }
+
+                }
+
+            }
+        });
+
+        // 事件修饰符 为了保证方法只有存粹的数据逻辑 而不是去处理DOM事件细节 Vue.js 为 v-on 提供了事件修饰符
+        // 有如下事件修饰符
+        //  .stop  阻止事件冒泡
+        // .prevent 阻止事件默认行为
+        // .capture 事件捕获 当它存在时，会先从外到里的捕获
+        // .self 跳过冒泡事件和捕获事件 只有直接作用在该元素上的事件才可以执行
+        // .once 只触发一次
+        // .passive 提前告诉浏览器程序不会阻止事件默认行为 以提高性能 尤其能够提升移动端的性能
+
+        // 使用修饰符时，顺序很重要；相应的代码会以同样的顺序产生
+
+        // 按键修饰符 监听键盘按键
+        // <input v-on:keyup.page-down="onPageDown"> 只有在$event.key = PageDown是才会调用
+        // Vue 提供了常用的按键别名
+        // .enter
+        // .tab
+        // .delete (捕获“删除”和“退格”键)
+        // .esc
+        // .space
+        // .up
+        // .down
+        // .left
+        // .right
+
+        // 全局 config.keyCodes 对象自定义按键修饰符别名：
+
+        // 组合键 <div v-on:click.ctrl="doSomething">Do something</div>  ctrl(修饰键) + click
+
+        // .exact 修饰符允许你控制由精确的系统修饰符组合触发的事件。
+        // <button v-on:click.ctrl.exact="onCtrlClick">A</button> 有且只有 Ctrl 被按下的时候才触发
+        // <button v-on:click.exact="onClick">A</button> 没有任何系统修饰符被按下的时候才触发
+
+        // 鼠标按钮修饰符 限制处理函数仅响应 特定的鼠标按钮
+        // .left
+        // .right
+        // .middle
+
+        // 表单输入绑定 v-model 创建双向数据绑定 它会根据控件类型 自动选择正确的方法来更新元素  本质是一个语法糖
+        // 它会忽略所有表单元素的 value、checked、selected的初始值而总是将 Vue 实例的数据作为数据来源
+        const app4 = new Vue({
+            el: "#app4",
+            data: {
+                msg: ''
+            }
+        });
+        // 多行文本
+        const app5 = new Vue({
+            el: "#app5",
+            data: {
+                msg: ''
+            }
+        });
+        // 复选框  多个复选框绑定到同一数组
+        const app6 = new Vue({
+            el: "#app6",
+            data: {
+                checkedNames: []
+            }
+        })
+        // 单选框
+        const app7 = new Vue({
+            el: "#app7",
+            data: {
+                picked: ''
+            }
+        });
+        // 选择框
+        const app8 = new Vue({
+            el: "#app8",
+            data: {
+                value: ''
+            }
+        });
+        // 多选框
+        const app9 = new Vue({
+            el: "#app9",
+            data: {
+                groups: []
+            }
+        });
+        // v-for动态渲染选项
+        const app10 = new Vue({
+            el: "#app10",
+            data: {
+                selected: 'AAA',
+                items: [
+                    "AAA",
+                    "BBB",
+                    "CCC",
+                    "DDD"
+                ]
+            }
+        });
+        // 值绑定 对于单选按钮，复选框及选择框的选项，v-model 绑定的值通常是静态字符串 (对于复选框也可以是布尔值)
+
+        // 把值绑定到 Vue 实例的一个动态 property 上，这时可以用 v-bind 实现，并且这个 property 的值可以不是字符串。
+        const app11 = new Vue({
+            el: "#app11",
+            data: {
+                key: 'placeholder',
+                value: "cainiao"
+            }
+        })
+
+        // property 和 attributes的区别
+        // property: property是DOM中的属性，是JavaScript里的对象； 是表示DOM元素自身的属性
+        // attribute: attribute是HTML标签上的特性，它的值只能够是字符串； 是表示用户自定义的属性
+
+        // property能够从attribute中得到同步；
+        // attribute不会同步property上的值；
+
+        // v-bind发生的是对attribute的绑定  所以使用v-bind不能实现双向绑定
+        // 而v-model是对property的绑定 能够从attribute获得值的同步 所以能实现双向绑定
+
+        // 修饰符
+        // .lazy  因为v-model是 v-on="change" 和 v-bind的语法糖
+        // v-model 在每次 input 事件触发后将输入框的值与数据进行同步 而.lazy修饰符让数据同步发生在 change 事件之后
+        // .number 自动将用户的输入值转为数值类型
+        // .trim 自动过滤用户输入的首尾空白字符，可以给 v-model 添加 trim 修饰符
+    </script>
+
+</body>
+
+</html>

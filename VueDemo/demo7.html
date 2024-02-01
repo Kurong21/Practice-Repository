@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入组件</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+</head>
+
+<body>
+
+    <div id="app1">
+        <component-a></component-a>
+    </div>
+
+    <div id="app2">
+        <!-- 报错 未知的子组件名 -->
+        <!-- <component-b></component-b> -->
+    </div>
+
+    <div id="app3">
+        <gobal-component-b></gobal-component-b>
+    </div>
+
+    <div id="app4">
+        <component-d></component-d>
+    </div>
+
+    <div id="app5">
+        <test :title="name"></test>
+    </div>
+    <!-- 在组件里面不显示title -->
+    <p id="app6" :title="title">这是p标签</p>
+
+
+    <div id="app7">
+        <button-content></button-content>
+    </div>
+
+    <div id="app8">
+        <button-component text="Hello" bg-color="green"></button-component>
+        <button-component text="Vue" bg-color="yellow"></button-component>
+        <button-component text="!!!" bg-color="blue"></button-component>
+    </div>
+
+    <div id="app9">
+        <my-component></my-component>
+    </div>
+
+    <div id="app10">
+        <father-checkbox></father-checkbox>
+    </div>
+
+    <div id="app11">
+        <checkbox-component v-model="checkValue"></checkbox-component>
+        <p>{{ checkValue }}</p>
+    </div>
+
+    <div id="app12">
+        <input-component @focus.native="onFocus"></input-component>
+    </div>
+
+    <div id="app13">
+        <school></school>
+    </div>
+
+    <div id="app14">
+        <content-component></content-component><br>
+    </div>
+
+    <div id="app15">
+        <my-button  @click.native="handleClick"></my-button>
+    </div>
+
+    <div id="app16">
+        <surplus-component></surplus-component>
+    </div>
+
+    <script>
+        Vue.config.productionTip = false;
+
+        // 注册组件
+        // 给Vue实例的component方法传递两个参数
+        // 第一个参数： 组件名
+        // 命名规范:  W3C 规范中的自定义组件名 (字母全小写且必须包含一个连字符) 有助于区分html标签
+        // 第二个参数： 组件描述 是一个对象 跟Vue实例中传入的对象差不多
+
+        // 局部注册  只在当前实例上生效  在其子组件中不可用
+        const Component = {
+            template: `<h2>局部注册的组件</h2>`
+        };
+        const Component2 = {
+            template: `<div>
+                    <component-a></component-a>
+                </div>`
+        }
+        new Vue({
+            el: "#app1",
+            components: {
+                'component-a': Component  // 组件名: 外部定义组件的选项对象
+            },
+        });
+        // 注意: 局部注册的组件在其子组件中不可用  
+        new Vue({
+            el: "#app2",
+            components: {
+                'component-b': Component2
+            }
+        });
+
+        // 全局注册的组件 在它的子组件内可用
+        Vue.component("gobal-component-a", {
+            template: `<h2>Gobal Component</h2>`
+        });
+
+        Vue.component("gobal-component-b", {
+            template: `<div>
+                    <gobal-component-a></gobal-component-a>
+                </div>`
+        });
+
+        new Vue({
+            el: "#app3",
+        });
+
+
+        // 解决 局部注册使用子组件
+        const componentA = {
+            template: `<h2>Welcome</h2>`
+        };
+        const componentB = {
+            components: {
+                "component-c": componentA
+            },
+            template: `<component-c></component-c>`
+        };
+        new Vue({
+            el: "#app4",
+            components: {
+                "component-d": componentB
+            }
+        });
+
+        // 组件的prop
+        // prop类型 支持数组 对象形式 列出
+        // props: ['title', 'likes', 'isPublished', 'commentIds', 'author']
+        // 名称和各自的类型
+        // props: {
+        //     title: String, 
+        //     likes: Number,
+        //     isPublished: Boolean,
+        //     commentIds: Array,
+        //     author: Object,
+        //     callback: Function,
+        //     contactsPromise: Promise 
+        // }
+
+        // 值 传递静态值 和 动态值(使用v-bind)
+        // 任何类型的值都可以传给prop
+
+        const test = {
+            props: ['title'],
+            template: `<div>
+                prop传递的值
+                </div>`,
+            data: function () {
+                return {
+                    name: "Hello" // 无效
+                }
+            }
+        }
+
+        // 挂载后 绑定的prop的值要定义在实例的data属性中 否则组件接收不到
+        new Vue({
+            el: "#app5",
+            components: {
+                test
+            },
+            data: {
+                name: "Hello",
+                published: false,
+            }
+        });
+
+        new Vue({
+            el: "#app6",
+            data: {
+                title: "Hello"
+            }
+        });
+
+
+        // vue的单向数据流 
+        // 指的是，数据在父组件中被定义和更新，然后通过props的形式传递给子组件，子组件可以读取这些props，但不能直接修改它们
+
+        // 按钮组件
+
+        Vue.component("button-content", {
+            data: function () {
+                return {
+                    btnName: "Joel",
+                    btnColor: "yellow"
+                }
+            },
+            template: `<div>
+                    <button-color :firstName="btnName" :bgColor="btnColor"></button-color>
+                </div>`
+        })
+
+        Vue.component("button-color", {
+            props: {
+                firstName: String,
+                bgColor: String,
+            },
+            template: `<button class="btn" :style="{ backgroundColor: bgColor}">{{ firstName }}</button>`
+        });
+
+        new Vue({ el: "#app7" })
+
+        // 根据父组件传递的值 显示对应的内容
+        Vue.component("button-component", {
+            props: {
+                text: String,
+                bgColor: String
+            },
+            template: `<button :style="{ backgroundColor: bgColor }">{{ text }}</button>`
+        })
+
+        new Vue({
+            el: "#app8"
+        });
+
+
+        // prop验证  
+        // prop 会在一个组件实例创建之前进行验证 所以不能在自定义验证函数上使用实例的property
+        // 对prop进行类型检查  (null 和 undefined 会通过任何类型验证)
+        // 假如propA有多个类型 propA: [String,Number]
+        // propB是必填项 propB： { type: String, required: true }
+        // 带有默认值 propC： { type: Number, default: 100}
+        // 还可以自定义验证函数
+        // propD: {
+        //     validator: function(value) {
+        //         return ....
+        //     }
+        // }
+
+        // 当prop验证失败的时候 开发环境构建的版本的Vue会在控制台产生一个警告
+
+        // 禁用 Attribute 继承 在组件的选项中设置 inheritAttrs: false  它不会影响 style 和 class 的绑定
+        // vue实例的$attrs属性：$attrs 包含了父组件传递给子组件但子组件没有明确定义的属性。
+
+        Vue.component('my-component', {
+            template: `<child-component concat="attr" custom-attr="parentAttr" message="Hello"></child-component>`
+        });
+
+        Vue.component('child-component', {
+            inheritAttrs: false, // 为false的时候 组件上自定义的attitude不会自动添加到根元素上去
+            props: {
+                message: String
+            },
+            template: `
+                <div> 
+                    <p>{{ message }}</p>
+                    <p v-for="(value,name) in $attrs" :key="name">{{ name }} : {{ value }}</p>
+                </div>
+            `
+        });
+        const app9 = new Vue({ el: "#app9" });
+        console.log(app9.$attrs);   // 为什么打印出来是一个空对象？
+        // 这意味着 在子组件上添加的属性如concat="attr" custom-attr="parentAttr"  不会被添加到它的根元素<div>上
+        // 有了$attrs 和 inheritAttrs: false 可以手动决定这些 attributes 会被赋予哪些元素
+
+
+        // 自定义事件 
+        // 不同于组件和 prop，事件名不存在任何自动化的大小写转换。而是触发的事件名需要完全匹配监听这个事件所用的名称。
+        // 命名： 始终使用 kebab-case 的事件名。 横杠命名法 如 my-event
+
+        // 自定义组件上的v-model
+        // model选项： 自定义v-model的行为
+
+        // Vue.component('father-checkbox', {
+        //     template: `
+        //         <div>
+        //             <base-checkbox @change="getValue"></base-checkbox>
+        //         </div>
+        //     `,
+        //     methods: {
+        //         getValue: function (val) {
+        //             console.log(val);
+        //         }
+        //     }
+        // })
+
+        // Vue.component('base-checkbox', {
+        //     model: {
+        //         prop: {
+        //             checked: '',
+        //             event: 'change',
+        //         }
+        //     },
+        //     props: {
+        //         checked: Boolean
+        //     },
+        //     template: `
+        //         <div>
+        //             <input type="checkbox" :checked="checked" @change="$emit('change',$event.target.checked)">
+        //         </div>
+        //     `
+        // });
+        // new Vue({
+        //     el: "#app10",
+        // })
+
+        Vue.component('checkbox-component', {
+            model: {
+                prop: 'checked',
+                event: 'change',
+            },
+            props: {
+                checked: Boolean
+            },
+            template: `
+                <div>
+                    <input type="checkbox" :checked="checked" @change="$emit('change',$event.target.checked)">
+                </div>
+            `
+        })
+
+        new Vue({
+            el: "#app11",
+            data: {
+                checkValue: false
+            }
+        });
+
+
+        // 组件绑定原生事件
+        Vue.component('input-component', {
+            // props: {
+            //     message: String
+            // },
+            data: function(){
+                return {
+                    message: ''
+                }
+            },
+            template: `
+                <div>
+                    <input type="text" placeholder="请输入内容" v-model="message">
+                    <p>输入框里面的内容：{{ message }}</p>
+                </div>
+            `
+        });
+        const app12 = new Vue({
+            el: "#app12",
+            methods: {
+                onFocus: function(e) {
+                    console.log(e.target);
+                }
+            }
+        })
+
+        // 全局注册父组件
+        Vue.component('school',{
+            data: function(){
+                return {
+                    schoolName: "nifgdg",
+                    schoolAddress: "fgdsg",
+                    newValue: "原始值",
+                    childValue: "接收到了"
+                }
+            },
+            template: `
+                <div>
+                    <p>学校名称：{{ schoolName }}</p>
+                    <p>学校地址：{{ schoolAddress }}</p>
+                    <p>{{ newValue }}</p>
+                    <student @send="getValue" :data="childValue"></student>
+                </div>
+            `,
+            methods: {
+                getValue: function(value) {
+                    this.newValue = value;
+                }
+            }
+        });
+        // 全局注册子组件
+        Vue.component('student',{
+            props: {
+                data: String
+            },
+            data: function(){
+                return {
+                    studentName: "tom",
+                    studentAge: 12,
+                    tranValue: "子组件的传值",
+                }
+            },
+            template: `
+                <div>
+                    <p>学生名称：{{ studentName }}</p>
+                    <p>学生名称：{{ studentAge }}</p>
+                    <button @click="sendValue">点击传值</button>
+                    <p>接收父组件的值: {{ data }}</p>
+                </div>
+            `,
+            methods: {
+                sendValue: function() {
+                    this.$emit('send',this.tranValue);
+                }
+            }
+        });
+        // 挂在到根组件上
+        new Vue({
+            el: "#app13"
+        });
+
+        // 子组件向父组件传值
+        // 1. 子组件内部定义要传递的值 使用自定义事件
+        // 2. 子组件监听自定义事件 使用$emit向父组件传值
+        // 3. 在父组件内部监听自定义事件 并执行内部方法 拿到子组件传过来的值
+
+        // 父组件向子组件传值 使用props
+        // 1. 在子组件内定义props
+        // 2. 在子组件上动态绑定这个props 也就是props的值与父组件内定义要传输的值相绑定
+
+        // 组件监听原生事件
+        // .native修饰符
+        Vue.component('my-button',{
+            template: `
+                <div>
+                    <button>点击我</button>    
+                </div>
+            `
+        });
+        new Vue({
+            el: "#app15",
+            methods: {
+                handleClick: function() {
+                    console.log("触发回调");  // 加上@click.native才会触发
+                }
+            }
+        })
+
+        // Vue在监听一个类似 <input> 的非常特定的元素时 .native会失败，也不会有任何报错 只是处理函数不会被调用
+        // Vue.component('content-component',{
+        //     template: `
+        //         <div>
+        //             <base-input v-on:focus.native="onFocus"></base-input>
+        //         </div>
+        //     `,
+        //     methods: {
+        //         onFocus: function(value) {
+        //             console.log(value);   // 无法触发focus事件
+        //         }
+        //     }
+        // })
+
+        // Vue.component('base-input',{
+        //     data: function(){
+        //         return {
+        //             value: 'wode'
+        //         }
+        //     },
+        //     template: `
+        //             <label>
+        //             <input type="text"
+        //                 v-bind="$attrs"
+        //                 :value="value"
+        //                 @input="$emit('focus',this.value)"
+        //             >
+        //             </label>
+        //     `,
+        // });
+        // new Vue({ el: "#app14" });
+
+        // 为了解决这个问题 Vue 提供了一个 $listeners property，它是一个对象，里面包含了作用在这个组件上的所有监听器。
+        // 配合 v-on="$listeners" 将所有的事件监听器指向这个组件的某个特定的子元素
+        Vue.component('content-component',{
+            template: `
+                <div>
+                    <base-input v-on:input="onFocus"></base-input>
+                </div>
+            `,
+            methods: {
+                onFocus: function(value) {
+                    console.log(value);
+                }
+            }
+        });
+
+        Vue.component('base-input',{
+            inheritAttrs: false,
+            props: ['label', 'value'],
+            computed: {
+                inputListeners: function() {
+                    var vm = this;
+                    return Object.assign({},
+                        this.$listeners, 
+                        {
+                            'input': function(event){
+                                console.log(event.target.value); // 这里就能正常触发input事件
+                            }
+                        }
+                    );
+                }
+            },
+            // data: function(){
+            //     return {
+            //         value: 'wode'
+            //     }
+            // },
+            template: `
+                    <label>
+                    <input type="text"
+                        v-bind="$attrs"
+                        :value="value"
+                        v-on="inputListeners""
+                    >
+                    </label>
+            `,
+        });
+        new Vue({ el: "#app14" });
+        // .native总结: 当我们需要给组件绑定原生事件的时候 由于组件不是原生的DOM元素 所以不会触发事件回调
+        // 这时候需要加上.native修饰符:相当于把事件放在了原生DOM元素上 所以可以触发事件回调
+        // 但是也有局限性: 它只会把事件绑定到子组件的根标签上,如上述例子: input事件被绑定到了label上,所以不会触发事件回调
+        // 解决: 使用$emit分发事件 或者使用$listeners ,它是一个对象，里面包含了作用在这个组件上的所有监听器。
+        // 使用Object.assign()将自定义的事件添加到$listeners对象中去 
+
+        // .sync 修饰符： 自动更新父组件属性的 v-on 监听器
+        // 作用： 子组件内不能直接修改外部数据
+        // Vue.component('expend-component',{
+        //     props: {
+        //         money: Number
+        //     },
+        //     template: `
+        //         <div>
+        //             <button type="button" @click="$emit('updata:money',money - 10)">花钱</button>
+        //             <p>还剩：{{ money }}</p>
+        //         </div>
+        //     `
+        // });
+        // Vue.component('surplus-component',{
+        //     data: function(){
+        //         return {
+        //             total: 1000,
+        //         }
+        //     },
+        //     // 这里的$event表示子组件触发事件后抛出的参数或者值
+        //     template: `
+        //         <div>
+        //             <P>总共有：{{ total }} 元</p>
+        //             <expend-component :money="total" @updata:money="updateTotal"></expend-component>
+        //         </div>
+        //     `,
+        //     methods: {
+        //         updateTotal: function(value){
+        //             this.total = value;
+        //         }
+        //     }
+        // });
+        // // 当子组件触发事件后 抛出修改后的值 传给父组件的值  实现修改父组件内部的值
+        // new Vue({ el: "#app16" });
+        
+        Vue.component('expend-component',{
+            props: {
+                money: Number
+            },
+            template: `
+                <div>
+                    <button type="button" @click="$emit('update:money',money - 10)">花钱</button>
+                    <p>还剩：{{ money }}</p>
+                </div>
+            `
+        });
+        Vue.component('surplus-component',{
+            data: function(){
+                return {
+                    total: 1000,
+                }
+            },
+            // 使用sync修饰符  vue的编译器会把子组件$emit('update:money', money - 100)的第二个参数自动地绑定到父组件.sync修饰的变量上。
+            template: `
+                <div>
+                    <P>总共有：{{ total }} 元</p>
+                    <expend-component :money.sync="total"></expend-component>
+                </div>
+            `
+        });
+        new Vue({ el: "#app16" });
+
+        
+    </script>
+</body>
+
+</html>

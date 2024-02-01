@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计算属性</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <!-- 引入lodash库 -->
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+    <!-- 引入Axios库 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+
+    <div id="app1">
+        <p>原始message:{{ message }}</p>
+        <p>计算属性:{{ reverMessage1 }}</p>
+        <p>方法:{{ reverMessage() }}</p>
+        <p>不是响应式依赖:{{ now }}</p>
+        <p>{{ now1() }}</p>
+    </div>
+
+    <div id="app2">
+        <p>侦听属性：{{ fullName }}</p>
+        <p>计算属性：{{ fullName2 }}</p>
+    </div>
+
+    <div id="app3">
+        <p>getter and setter:{{ fullParam }}</p>
+    </div>
+
+    <div id="watchExample">
+        <p>
+            问一个问题：
+            <input v-model="question">
+        </p>
+        <p>{{ answer }}</p>
+        <div><img :src="url"></div>
+    </div>
+    <!-- 给 v-bind:class 一个对象，以动态地切换 class： -->
+    <!-- { active: isActive }语法表示 active 这个 class 存在与否将取决于数据isActive 的 真值 -->
+    <div id="app4" class="static" :class="{ active: isActive,'text-danger': hasError }">添加class</div>
+
+    <div id="static" :class="classObject">计算属性添加class</div>
+
+    <div id="app5">
+        <my-component class="static" :class="{ active: isActive }"></my-component>
+    </div>
+
+    <div id="app6" :style="{ color: red,fontSize: size }">内联样式</div>
+
+    <div id="app7" :style="styleObject">对象绑定内联样式</div>
+
+    <div id="app8" :style="styleObject">计算属性绑定内联样式</div>
+
+    <div id="app9" :style="[baseStyles,overridingStyles]">计算属性绑定内联样式</div>
+
+    <script>
+        // 计算属性 compute 对于任何复杂逻辑，你都应当使用计算属性。
+        // reverMessage的值完全取决于message message改变 reverMessage随之改变
+        const app = new Vue({
+            el: "#app1",
+            data: {
+                message: "Hello"
+            },
+            computed: {
+                reverMessage1: function () {
+                    return this.message.split('').reverse().join('');
+                },
+                now: function () {
+                    return Date.now();
+                }
+            },
+            methods: {
+                reverMessage: function () {
+                    return this.message.split('').reverse().join('');
+                },
+                now1: function () {
+                    return Date.now();
+                }
+            }
+        });
+
+        // 计算属性与方法的区别：在结果上两者完全一致 ，不同的是计算属性是基于它们的响应式依赖进行缓存的
+        // 只在相关响应式依赖发生改变时它们才会重新求值
+        // 这就意味着只要 message 还没有发生改变，多次访问 reversedMessage 计算属性会立即返回之前的计算结果，而不必再次执行函数。
+        // 不适用于计算属性：Date.now() 因为该值是时刻更新的 使用计算属性会返回之前缓存的值
+        // 我们为什么需要缓存？假设我们有一个性能开销比较大的计算属性 A，它需要遍历一个巨大的数组并做大量的计算。
+        // 然后我们可能有其他的计算属性依赖于 A。如果没有缓存，我们将不可避免的多次执行 A 的 getter！如果你不希望有缓存，请用方法来替代。
+
+        // 侦听属性 一种更通用的方式来观察和响应Vue实例上的数据变动
+        const app2 = new Vue({
+            el: "#app2",
+            data: {
+                firstName: "joe",
+                lastName: "lulu",
+                fullName: "john"
+            },
+            computed: {
+                fullName2: function () {
+                    return this.firstName + " " + this.lastName;
+                }
+            },
+            watch: {
+                firstName: function (val) {
+                    this.fullName = val + ' ' + this.lastName;
+                },
+                lastName: function (val) {
+                    this.fullName = this.firstName + ' ' + val;
+                }
+            }
+        });
+        // 当数据发生变化的时候 实例自动调用watch里面的方法 对关联数据实时更新
+        // app2.firstName = "join";
+
+        // 但是使用这种方法 不如使用计算属性简便
+        // 1.watch擅长处理的场景：一个数据影响多个数据
+        // 2.computed擅长处理的场景：一个数据受多个数据影响
+
+        // 计算属性默认只有getter  setter在需要时可以手动设置
+        const app3 = new Vue({
+            el: "#app3",
+            data: {
+                firstParam: "HELLO",
+                lastParam: "VUE",
+            },
+            computed: {
+                fullParam: {
+                    //getter
+                    get: function () {
+                        return this.firstParam + ' ' + this.lastParam;
+                    },
+                    // setter
+                    set: function (name) {
+                        name = name.split(' ');
+                        this.firstParam = name[0];
+                        this.lastParam = name[name.length - 1];
+                    }
+                }
+            }
+        });
+        // 改变值后 自动调用setter方法 更新数据
+        app3.fullParam = "Teng Rui";
+
+        // 虽说侦听属性不如计算属性简便  但在数据变化时执行异步或数据量较大的操作时 侦听属性是最有用的。
+
+        const watchExample = new Vue({
+            el: "#watchExample",
+            data: {
+                question: "",
+                answer: "我会为你回答一个问题在你提问之后",
+                url: ""
+            },
+            watch: {
+                question: function (newQuestion, oldQuestion) {
+                    this.answer = "等待输入完成";
+                    this.debouncedGetAnswer();
+                }
+            },
+            // 使用lodash的防抖函数
+            created: function () {
+                this.debouncedGetAnswer = _.debounce(this.getAnswer, 500);
+            },
+            methods: {
+                getAnswer: function () {
+                    if (this.question.indexOf('?') === -1) {
+                        this.answer = "问题应该包含问号(且是英文问号)";
+                        return
+                    }
+                    // this.answer = "这是我的回答";
+                    axios.get('https://yesno.wtf/api')
+                        .then((response) => {
+                            this.answer = response.data.answer;
+                            this.url = response.data.image;
+                        })
+                        .catch((e) => {
+                            watchExample.answer = `发生了一些错误：${e}`;
+                        })
+                }
+            }
+        });
+
+        // 给HTML元素绑定class 使用v-bind 给元素绑定一个数据对象
+        // 可以在对象中传入更多字段来动态切换多个 class。此外，v-bind:class 指令也可以与普通的 class attribute 共存
+        const app4 = new Vue({
+            el: "#app4",
+            data: {
+                isActive: true,
+                hasError: true
+            }
+        });
+
+        // 绑定的数据对象不必定义在模板里 和上面效果一致
+        // <div :class="classObject"></div>
+        // data: {
+        //      classObject: {
+        //          isActive: true,
+        //          hasError: true
+        //      }
+        // }
+
+        // 也可以绑定一个返回对象的计算属性
+        const static = new Vue({
+            el: "#static",
+            data: {
+                isActive: true,
+                error: null
+            },
+            computed: {
+                classObject: function () {
+                    return {
+                        active: this.isActive && !this.error,
+                        'text-danger': !this.error
+                    }
+                }
+            }
+        });
+
+        // 数组语法
+        // 将一个数组传给 v-bind:class 生成一个class列表 
+        // <div v-bind:class="[activeClass, errorClass]"></div>
+        // 也可以应用三元表达式 <div v-bind:class="[isActive ? activeClass : '', errorClass]"></div>
+
+        // 在组件上使用 当在一个自定义组件上使用 class property 时，这些 class 将被添加到该组件的根元素上面
+        Vue.component("my-component", {
+            template: "<p class='foo bar'>组件上添加class</p>" // 模板上添加的class不会覆盖组件原有的class
+        });
+
+        const app5 = new Vue({
+            el: "#app5",
+            data: {
+                isActive: true // 对于数据绑定的class同样适用
+            }
+        });
+
+        // 绑定内联样式
+        const app6 = new Vue({
+            el: "#app6",
+            data: {
+                red: "red",
+                size: "50px"
+            }
+        })
+        // 绑定样式对象
+        const app7 = new Vue({
+            el: "#app7",
+            data: {
+                styleObject: {
+                    color: "red",
+                    fontSize: "50px"
+                }
+            }
+        });
+        // 对象语法常常结合返回对象的计算属性使用
+        const app8 = new Vue({
+            el: "#app8",
+            data: {
+                color: "red",
+                fontSize: 50
+            },
+            computed: {
+                styleObject: function(){
+                    return {
+                        color: this.color,
+                        fontSize: this.fontSize + "px"
+                    }
+                }
+            }
+        });
+        // v-bind:style 的数组语法可以将多个样式对象应用到同一个元素上 
+        // 相同样式:后面的会覆盖前面的
+        const app9 = new Vue({
+            el: "#app9",
+            data: {
+                baseStyles: {
+                    color: "blue",
+                    fontWeight: 900
+                },
+                overridingStyles: {
+                    fontSize: 20 + "px"
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

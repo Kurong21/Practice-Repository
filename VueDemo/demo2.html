@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue实例</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+</head>
+
+<body>
+    <div id="app">
+        <p>{{ a }}</p>
+    </div>
+
+    <div id="app2">
+        <p>{{ message }}</p>
+        <!-- <p>{{ newProp }}</p> -->
+    </div>
+
+    <div id="app3">
+        <p>{{ message }}</p>
+        <!-- v-on或@指令用于添加事件监听器，通常后面跟着的是JavaScript事件名称 -->
+        <!-- 但是Vue.js允许您在事件处理程序中执行表达式，所以当按钮被点击时，message属性会被设置为 'baz'。 -->
+        <button @click="message = 'baz'"></button>
+    </div>
+
+    <div id="app4">
+        <span v-once>{{ message }}</span>
+        <p>使用v-html指令前:{{ rawHtml }}</p>
+        <p>使用v-html指令后: <span v-html="rawHtml"></span></p>
+    </div>
+    <div id="app5">
+        <!-- <div> -->
+            <span v-bind:id="dynamicId">动态ID</span>
+            <button v-bind:disabled="isButtonDisabled">Button</button>
+            <P v-bind:class="'list-' + id"></P>
+            <!-- <p>{{ gobal }}</p> 这里是访问不到用户自定义的gobal变量的--> 
+            <!-- 但是可以访问全局变量白名单里面的，如Math,Date... -->
+            <p>{{ Math.floor(1.23) }}</p> 
+        <!-- </div> -->
+    </div>
+    <!-- 这里的 attributeName 会被浏览器转化为 attributename -->
+    <a id="app6" v-bind:[attributeName]="url">动态链接</a>
+
+    <script>
+
+        const data = { a: 1 }
+        const vm = new Vue({
+            el: '#app',
+            data: data
+        });
+        console.log(data.a === vm.a); // true
+
+        data.a = 3;
+        console.log(vm.a); // 3 响应式数据
+
+        //只有当实例被创建时就已经存在于 data 中的 property 才是响应式的
+        const app2 = new Vue({
+            el: "#app2",
+            data: {
+                message: "hello"
+            }
+        });
+
+        // app2.newProp = "Hi Vue"; // 不会更新视图
+
+        //一般来说 属性 property 初始值设置如下 在最开始不明确值的时候
+        // data = {
+        //     text: "",
+        //     count: 0,
+        //     isTrue: false,
+        //     list: [],
+        //     error: null
+        // }
+
+        // Object.freeze() 阻止修改现有的property 意味着响应系统无法追踪变化
+        const obj = {
+            message: "hello"
+        }
+
+        // Object.freeze(obj);
+
+        const app3 = new Vue({
+            el: "#app3",
+            data: obj
+        });
+        // app3.message = "hi"; // 报错
+        console.log(app3.message);
+
+        // 区分Vue实例与用户自定义的property
+        console.log(app3.$el === document.querySelector("#app3")); // true
+        console.log(app3.$data.message); // hello
+
+        // Vue生命周期钩子
+        // 在vue中，钩子指的是“hook”，是一种事件劫持机制，可以比事件更早进行执行处理；
+        // 钩子可以理解为vue的内置事件，但是这个内置事件需要主动去配置，可以用来处理被拦截的函数调用、事件和消息。
+        // 在程序里来说就是你定义了一个小功能，可以利用这个钩子在任何想用的地方挂上去。
+        // 每个 Vue 实例在被创建时都要经过一系列的初始化过程——例如，需要设置数据监听、编译模板、将实例挂载到 DOM 并在数据变化时更新 DOM 等
+        // 在这个过程中会运行一些叫做 "生命周期钩子"的函数，给用户在不同阶段处理相应的逻辑的机会
+        // 什么是生命周期钩子？
+        // 在Vue实例初始化的过程中，会运行一些函数（this值指向Vue实例），实例生命周期的不同阶段被调用,这些函数使得用户可以添加自己的代码
+
+        // 模板语法： Vue.js 使用了基于 HTML 的模板语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。
+
+        // 插值
+        // 数据绑定最常见的形式就是使用“Mustache”语法 (双大括号) 的文本插值：<p>{{ message }}</p> 绑定的数据对象的message改变 插值内容会同步更新
+        // 一次性插值 v-once 指令 数据改变时 插值处的内容不会改变  此指令会影响该节点其他地方的数据绑定
+
+        const app4 = new Vue({
+            el: "#app4",
+            data: {
+                message: "不会改变",
+                rawHtml: "<span style='color:red'>红色字体</span>"
+            }
+        });
+        app4.message = "变一下";  // 无效更新
+
+        // 输出原始HTML v-html 指令 只对可信内容使用html插值，绝不要对用户提供的内容使用 可能会导致XSS攻击
+
+        // 属性 attuibute Mustache语法' {{}} '不能直接作用在HTML属性上，应使用v-bind指令
+        const app5 = new Vue({
+            el: "#app5",
+            data: {
+                dynamicId: "exp",
+                isButtonDisabled: null,
+                id: 1
+            }
+        });
+        app5.dynamicId = "color"; // 动态的对属性 id 进行修改 同理 class 属性也可以
+        
+        // 使用 JavaScript 表达式 对于所有的数据绑定，Vue.js 都提供了完全的 JavaScript 表达式支持
+        // 例如：{{number + 1}} {{ok ? 'yes' : 'no'}}
+        // <P v-bind:class="'list-' + id"></P> ===> <P class="list-1"></P>
+        // 只对表达式生效 语句不生效 且每个绑定只能包含单个表达式
+        // {{ var a = 1 }}这是语句 或者 {{ if(true) { return 1 } }}
+
+        // 模板表达式都被放在沙盒中，只能访问全局变量的一个白名单，如 Math 和 Date 。你不应该在模板表达式中试图访问用户定义的全局变量。
+        // 所谓沙盒就是为运行中的程序提供的一个隔离的环境 以确保不会出现潜在的安全漏洞或副作用。
+        const gobal = "我是用户自定义的全局变量";
+
+        // 指令: 是带有 v- 前缀的特殊属性attitude 它的值预期是一个单个的JavaScript表达式(v-for是例外)
+        // 它的职责是：当表达式的值发生改变时 将其产生的连带影响 响应式的作用与DOM
+        // 指令参数：在指令后面以 : 表示 <a v-bind:href="url"></a> href就是对应的参数  告知v-bind将该元素的href属性和url的值相绑定
+        // 动态指令参数 2.6.0新增
+        // <a v-bind:[attributeName]="url"> ... </a> attributeName作为一个JavaScript表达式进行动态求值，将最终值作为参数值使用
+        const app6 = new Vue({
+            el: "#app6",
+            data: {
+                url: "https://www.baidu.com",
+                attributename: "href"
+            }
+        });
+        // 修改链接
+        // app6.url = "https://www.google.com";
+        // 参数值约束：当参数值为null 时 会显式的移除绑定   任何其它非字符串类型的值都将会触发一个警告
+        // vue.js:5110 [Vue warn]: Invalid value for dynamic directive argument (expected string or null): 
+        
+        // 对动态参数表达式的约束  因为某些字符，如空格和引号，放在 HTML attribute 名里是无效的
+        // <a v-bind:['foo' + bar]="value"> ... </a>
+        // 参数名不要使用大写 因为浏览器会把 属性名attribute 名全部强制转为小写：
+
+        // 修饰符是以半角句号 . 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定
+
+        // 缩写： Vue 为 v-bind 和 v-on 这两个最常用的指令，提供了特定简写：
+        // v-bind缩写：
+            // 完整写法：<a v-bind:href="url">...<a/>
+            // 缩写：<a :href="url">...<a/>
+            // 动态参数的缩写：<a :[key]="url">...<a/>
+
+        // v-on缩写：
+                // 完整写法：<a v-on:click="do">...</a>
+                // 缩写：<a @click="do">...</a>
+                // 动态参数缩写：<a @[event]:="do">...</a>
+    </script>
+</body>
+
+</html>

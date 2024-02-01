@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <head name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TodoList</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+        <style>
+            @import "https://unpkg.com/todomvc-app-css@2.4.1/index.css";
+
+            /* .list-item {
+                display: inline-block;
+                margin-right: 10px;
+            } */
+
+            .list-enter-active, .list-leave-active {
+                transition: all 1s;
+            }
+
+            .list-enter, .list-leave-to
+            /* .list-leave-active for below version 2.1.8 */ {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            .label-enter-active, .label-leave-active{
+                transition: all 2s;
+            }
+
+            .label-enter, .label-leave-to{
+                color: #d9d9d9;
+                text-decoration: line-through;
+            }
+        </style>
+    </head>
+
+<body>
+    <!-- <input id="test" type="text" placeholder="请输入...">
+    <button id="btn">点击获得输入框焦点</button> -->
+    <section class="todoapp" v-cloak>
+        <header class="header">
+            <h1>todos</h1>
+            <!-- 使用v-model将input输入框的值和实例数据中的值绑定 -->
+            <input class="new-todo" autocomplete="off" placeholder="What needs to be done?" @keyup.enter="addTodo"
+                v-model="newTodo">
+        </header>
+        <section class="main">
+            <input id="toggle-all" class="toggle-all" type="checkbox" @click="toggleAll">
+            <label for="toggle-all">Mark all as complete</label>
+            <ul class="todo-list">
+                <!-- 添加动画 -->
+                <transition-group name="list" tag="li" appear>
+                    <li class="todo" v-for="todo in filterTodos" :key="todo.id"
+                            :class="{completed: todo.completed, editing: todo == editedTodo}">
+                            <div class="view">
+                                <!-- 使用v-model实现input的值和todo.completed双向绑定 -->
+                                <input class="toggle" type="checkbox" v-model="todo.completed">
+                            <transition name="label" tag="label">
+                                <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
+                            </transition>
+                                <button class="destroy" @click="removeTodo(todo)"></button>
+                            </div>
+                            <input class="edit" type="text" v-model="todo.title" v-todo-focus="todo == editedTodo"
+                                @keyup.enter="doneEdit(todo)" @blur="doneEdit(todo)" @keyup.esc="cancelEdit(todo)">
+                    </li>
+                </transition-group>
+            </ul>
+        </section>
+        <footer class="footer" v-show="showFooter">
+            <span class="todo-count">
+                <strong>{{ items }}</strong> left
+            </span>
+            <ul class="filters">
+                <!-- 根据当前hashtags选择绑定class -->
+                <li><a :class="{selected: hashtags == 'all'}" href="#/all">All</a></li>
+                <li><a :class="{selected: hashtags == 'active'}" href="#/active">Active</a></li>
+                <li><a :class="{selected: hashtags == 'complated'}" href="#/completed">Completed</a></li>
+            </ul>
+            <button class="clear-completed" @click="removeAll">
+                Clear completed
+            </button>
+        </footer>
+    </section>
+
+    <script>
+        new Vue({
+            el: '.todoapp',
+            data: {
+                todos: [
+                    {
+                        id: 1,
+                        title: '吃饭',
+                        completed: false,
+                    },
+                    {
+                        id: 2,
+                        title: '睡觉',
+                        completed: true,
+                    },
+                    {
+                        id: 3,
+                        title: '打豆豆',
+                        completed: false,
+                    }
+                ],
+                newTodo: '',
+                hashtags: 'all',
+                editedTodo: null,
+                beforeTitle: null
+            },
+            methods: {
+                addTodo: function () {
+                    var value = this.newTodo && this.newTodo.trim();
+                    if (!value) {
+                        return
+                    }
+                    this.todos.push({ id: this.todos.length + 1, title: value, complated: false });
+                    this.newTodo = '';
+                },
+                toggleAll: function (e) {
+                    // 传进来一个事件对象 根据事件对象的checked值来设置每一个todo的值
+                    this.todos.forEach(item => item.completed = e.target.checked);
+                },
+                removeTodo: function (todo) {
+                    this.todos.splice(this.todos.indexOf(todo), 1);
+                },
+                removeAll: function () {
+                    this.todos = this.completed;
+                },
+                onHashChange: function () {
+                    const hash = window.location.hash.replace(/#\/?/, '');
+                    // 根据当前hash值设置hashtags
+                    if (['all', 'active', 'completed'].includes(hash)) {
+                        this.hashtags = hash;
+                    } else {
+                        window.location.hash = '';
+                        this.hashtags = 'all';
+                    }
+                },
+                // 注册一个鼠标双击事件 将editedTodo要修改的todo 再通过自定义指令确定焦点元素
+                editTodo: function (todo) {
+                    this.beforeTitle = todo.title;
+                    this.editedTodo = todo;
+                },
+                doneEdit: function (todo) {
+                    // 失去焦点后隐藏输入框
+                    if (!this.editedTodo) {
+                        return
+                    }
+                    this.editedTodo = null;
+                    todo.title = todo.title.trim();
+                    // 编辑后，若删除了title 则移除整个
+                    if (!todo.title) {
+                        this.removeTodo(todo);
+                    }
+                },
+                cancelEdit: function (todo) {
+                    // 失去焦点 不改变值
+                    this.editedTodo = null;
+                    todo.title = this.beforeTitle;
+                }
+            },
+            // 自定义指令
+            directives: {
+                'todo-focus': function (el, binding) {
+                    // el 是当前绑定事件的元素  binding是一个对象 若binding的值为true 则进行操作
+                    // 当在todo上触发双击事件的时候 el(也就是input)获得焦点
+                    if (binding.value) {
+                        el.focus();
+                    }
+                }
+            },
+            // 在初始挂载的钩子函数监听hashchange事件 获取当前hash值  根据当前hash值来筛选todos
+            mounted: function () {
+                window.addEventListener("hashchange", this.onHashChange);
+                // 避免在刷新的时候 不会进行筛选 再调用一次onHashChange
+                this.onHashChange();
+            },
+            computed: {
+                items: function () {
+                    var undone = this.filterTodos.filter(todo => !todo.completed);
+                    return undone.length > 1 ? undone.length + 'items' : undone.length + 'item';
+                },
+                // 计算属性获得一个已经包含一个未完成的todos数组
+                completed: function () {
+                    return this.todos.filter(todo => !todo.completed);
+                },
+                filterTodos: function () {
+                    // 根据不同的hashtags展示不同的filterTodos
+                    switch (this.hashtags) {
+                        case 'all':
+                            return this.todos;
+                        case 'active':
+                            return this.completed;
+                        case 'completed':
+                            return this.todos.filter(todo => todo.completed);
+                    }
+                },
+                // 设置一个计算属性  当没有todo的时候 不显示footer
+                showFooter: function () {
+                    return this.todos.length === 0 ? false : true;
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态组件</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <style>
+        .tab-button {
+            padding: 6px 10px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background: #f0f0f0;
+            margin-bottom: -1px;
+            margin-right: -1px;
+        }
+
+        .tab-button:hover {
+            background: #e0e0e0;
+        }
+
+        .tab-button.active {
+            background: #e0e0e0;
+        }
+
+        .tab {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .posts-tab {
+            display: flex;
+        }
+
+        .posts-sidebar {
+            max-width: 40vw;
+            margin: 0;
+            padding: 0 10px 0 0;
+            list-style-type: none;
+            border-right: 1px solid #ccc;
+        }
+
+        .posts-sidebar li {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .posts-sidebar li:hover {
+            background: #eee;
+        }
+
+        .posts-sidebar li.selected {
+            background: lightblue;
+        }
+
+        .selected-post-container {
+            padding-left: 10px;
+        }
+
+        .selected-post> :first-child {
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        ul {
+            list-style: none;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="dynamic">
+        <button v-for="(tab,index) in tabs" :key="index" :class="['tab-button',{ active: currentTab === tab }]"
+            @click="currentTab = tab">
+            {{ tab }}
+        </button>
+        <!-- <keep-alive> -->
+        <component :is="currentTabComponent" class="tab"></component>
+        <!-- </keep-alive> -->
+    </div>
+
+    <div id="app1">
+        <button v-for="item in list" :key="item.id" @click="current = item.name">
+            {{ item.title }}
+        </button>
+        <component :is="switchTab"></component>
+    </div>
+
+    <div id="app2">
+        <parent-component></parent-component>
+    </div>
+
+    <div id="app3">
+        <translation-component></translation-component>
+    </div>
+
+    <div id="app5">
+        <!-- Maximum call stack size exceeded 死循环 -->
+        <unique-name-of-my-component :lists="lists"></unique-name-of-my-component>
+    </div>
+
+    <div id="app7">
+        <tree-folder-contents :children="children"></tree-folder-contents>
+    </div>
+
+    <div id="app8">
+        <my-component inline-template>
+            <div>
+                <p>These are compiled as the component's own template.</p>
+                <p>Not parent's transclusion content.</p>
+              </div>
+        </my-component>
+    </div>
+
+    <div id="app9">
+        <hello-world>
+            
+        </hello-world>
+    </div>
+
+    <script type="text/x-template" id="hello-world-template">
+        <p>Hello hello hello!!!</p>
+      </script>
+    <script>
+        // 在动态组件上使用 keep-alive 保持组件的状态 避免重复渲染
+        Vue.component('tab-posts', {
+            template: `
+                <div class="posts-tab">
+                    <ul>
+                        <li
+                            v-for="item in content"
+                            :key="item.id"
+                            :class="{ selected: item === selectedPost }"
+                            v-on:click="selectedPost = item"
+                        >
+                            {{ item.title }}
+                        </li>
+                    </ul>
+                    <div class="selected-post-container">
+                        <div
+                            v-if="selectedPost"
+                            class="selected-post"
+                        >
+                        <h3>{{ selectedPost.title }}</h3>
+                        <div v-html="selectedPost.text"></div>
+                        </div>
+                        <strong v-else>
+                            Click on a blog title to the left to view it.
+                        </strong>
+                    </div>
+                </div>
+            `,
+            data: function () {
+                return {
+                    content: [
+                        {
+                            id: 1,
+                            title: "Cat Ipsum",
+                            text: "<p>Dont wait for the storm to pass, dance in the rain kick up litter decide to want nothing to do with my owner today demand to be let outside at once, and expect owner to wait for me as i think about it cat cat moo moo lick ears lick paws so make meme, make cute face but lick the other cats. Kitty poochy chase imaginary bugs, but stand in front of the computer screen. Sweet beast cat dog hate mouse eat string barf pillow no baths hate everything stare at guinea pigs. My left donut is missing, as is my right loved it, hated it, loved it, hated it scoot butt on the rug cat not kitten around</p>"
+                        },
+                        {
+                            id: 2,
+                            title: "Hipster Ipsum",
+                            text:
+                                "<p>Bushwick blue bottle scenester helvetica ugh, meh four loko. Put a bird on it lumbersexual franzen shabby chic, street art knausgaard trust fund shaman scenester live-edge mixtape taxidermy viral yuccie succulents. Keytar poke bicycle rights, crucifix street art neutra air plant PBR&B hoodie plaid venmo. Tilde swag art party fanny pack vinyl letterpress venmo jean shorts offal mumblecore. Vice blog gentrify mlkshk tattooed occupy snackwave, hoodie craft beer next level migas 8-bit chartreuse. Trust fund food truck drinking vinegar gochujang.</p>"
+                        },
+                        {
+                            id: 3,
+                            title: "Cupcake Ipsum",
+                            text:
+                                "<p>Icing dessert soufflé lollipop chocolate bar sweet tart cake chupa chups. Soufflé marzipan jelly beans croissant toffee marzipan cupcake icing fruitcake. Muffin cake pudding soufflé wafer jelly bear claw sesame snaps marshmallow. Marzipan soufflé croissant lemon drops gingerbread sugar plum lemon drops apple pie gummies. Sweet roll donut oat cake toffee cake. Liquorice candy macaroon toffee cookie marzipan.</p>"
+                        }
+                    ],
+                    selectedPost: null
+                }
+            }
+        })
+
+        Vue.component('tab-archive', {
+            template: `
+                <div>Archive component</div>
+            `
+        })
+
+        new Vue({
+            el: "#dynamic",
+            data: {
+                tabs: ['Posts', 'Archive'],
+                currentTab: 'Posts'
+            },
+            computed: {
+                currentTabComponent: function () {
+                    return "tab-" + this.currentTab.toLowerCase();
+                }
+            }
+        });
+
+        Vue.component('home-compontent', {
+            template: `
+                <div>
+                    <p>这是首页</p>
+                </div>
+            `
+        });
+        Vue.component('movie-compontent', {
+            template: `
+                <div>
+                    <p>这是电影页</p>
+                </div>
+            `
+        });
+        Vue.component('game-compontent', {
+            template: `
+                <div>
+                    <p>这是游戏页</p>
+                </div>
+            `
+        });
+
+        const app = new Vue({
+            el: "#app1",
+            data: {
+                list: [
+                    {
+                        id: 1,
+                        title: '首页',
+                        name: 'home'
+                    },
+                    {
+                        id: 2,
+                        title: '电影',
+                        name: 'movie'
+                    },
+                    {
+                        id: 3,
+                        title: '游戏',
+                        name: 'game'
+                    }
+                ],
+                current: 'home'
+            },
+            computed: {
+                switchTab: function () {
+                    return this.current + '-compontent';
+                    // console.log(this.current);
+                }
+            }
+        });
+
+        // 访问根组件 $root
+        console.log(app.$root.current); // home
+        // 可以访问根组件的 数据 计算属性 写入根组件数据 调用根组件的方法
+        // 仅适用于demo和中小型应用 大型应用推荐使用VueX
+
+        // 访问父级根组件实例 $parent 用来从一个子组件访问父级组件实例  代替使用prop将数据传入子组件的方式
+
+        Vue.component('parent-component', {
+            data: function () {
+                return {
+                    message: 'some message'
+                }
+            },
+            template: `
+                <div>
+                    <p>父级组件</p>
+                    <button @click="test">点击访问子组件数据</button>
+                    <child-component ref="example"></child-component>
+                </div>
+            `,
+            methods: {
+                test: function () {
+                    console.log(this.$refs.example.childMessage);
+                }
+            }
+        });
+
+        Vue.component('child-component', {
+            // props: {
+            //     message: String
+            // },
+            data: function () {
+                return {
+                    childMessage: 'child message'
+                }
+            },
+            template: `
+                <div class="child">
+                    <span>父级组件传的值：{{ getValue }}</span>
+                </div>
+            `,
+            computed: {
+                getValue: function () {
+                    return this.$parent.message; // 使用$parent访问父级组件数据
+                },
+            },
+        });
+        new Vue({ el: "#app2" });
+        // 缺点： 如果组件层级嵌套太多就会 this.$parent.$parent.$parent....message
+
+        // 访问子组件实例或子元素： 通过 ref 这个 attribute 为子组件赋予一个 ID 引用
+
+        // 当组件嵌套的层次过于深入的时候 父组件使用props向子组件传递数据 就要将prop传递到组件链中 造成混乱
+        // 特性： 使用 provide 和 inject 对
+        // 这个特性有两个部分：父组件有一个 provide 选项来提供数据，子组件有一个 inject 选项来开始使用这个数据。
+
+        Vue.component('translation-component', {
+            data: function () {
+                return {
+                    rootValue: 'some value'
+                }
+            },
+            // 使用provide提供数据
+            provide: function () {
+                return {
+                    rootValue: this.changeValue
+                }
+            },
+            template: `
+                <div>
+                    <h1>父级组件</h1>
+                    <button @click="changeValue">改变值</button>
+                    <translationone-component></translationone-component>
+                </div>
+            `,
+            methods: {
+                changeValue: function () {
+                    this.rootValue = Math.floor(Math.random() * 100);
+                    // console.log(this.rootValue);
+                    return this.rootValue;
+                }
+            }
+        });
+        Vue.component('translationone-component', {
+            data: function () {
+                return {}
+            },
+            // inject: ['rootValue'],
+            template: `
+                <div>
+                    <h2>子级组件</h2>
+                    <translationthree-component></translationthree-component>
+                </div>
+            `
+        });
+        Vue.component('translationthree-component', {
+            inject: ['rootValue'],
+            template: `
+                <div>
+                    <h3>孙级组件</h3>
+                    <p>父级组件传过来的值：{{ getValue }}</p>
+                </div>
+            `,
+            //  使用计算属性接收 或者 直接使用传递的变量名接收
+            computed: {
+                getValue: function () {
+                    return this.rootValue();
+                }
+            }
+        });
+
+        new Vue({
+            el: "#app3"
+        })
+        //  使用provide 和 inject对 可以直接向子孙组件传递数据 但是传递的数据不是响应式的
+        // 解决： 通过给provide提供一个函数来返回数据的方式 传递给子孙组件来实现响应式数据
+
+        // 递归调用组件自身
+        // 确保有一个递归调用是有条件性的
+        // 例如使用一个最终会得到 false 的 v-if
+        Vue.component('unique-name-of-my-component', {
+            name: 'stack-overflow',
+            props: {
+                lists: Array
+            },
+            template: `
+                <ul>
+                    <li v-for="list in lists" :key="list.id"">
+                        {{ list.name }}
+                        <stack-overflow v-if="list.childList && list.childList.length > 0" :lists="list.childList"></stack-overflow>
+                    </li>
+                </ul>
+            `,
+
+        });
+
+        new Vue({
+            el: "#app5",
+            data: {
+                lists: [
+                    {
+                        id: 1,
+                        name: 'joins',
+                        childList: [
+                            {
+                                id: 11,
+                                name: 'join-jones',
+                                childList: [
+                                    {
+                                        id: 12,
+                                        name: 'curry'
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: 'james',
+                        childList: [
+                            {
+                                id: 21,
+                                name: 'james-brokers',
+                                childList: []
+                            },
+                            {
+                                id: 22,
+                                name: 'james-jannels',
+                                childList: [
+                                    {
+                                        id: 221,
+                                        name: 'james-federations',
+                                        childList: []
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: 'durant',
+                        childList: [
+                            {
+                                id: 31,
+                                name: 'sijiali'
+                            }
+                        ]
+                    }
+                ]
+            }
+        });
+
+        // 循环组件注意事项：
+        // 数据放在父组件中，使用props传值
+        // 动态绑定下一次循环需要使用的数据
+
+
+        // 组件之间的循环引用 A依赖于B B又依赖于A 在全局注册时没有问题 但通过使用一个模块系统依赖/导入组件会出现报错
+
+        Vue.component('tree-folder', {
+            props: {
+                folder: Object
+            },
+            template: `
+                <p>
+                    <span>{{ folder.name }}</span>
+                    <tree-folder-contents :children="folder.children"/>
+                </p>
+            `
+        });
+
+        Vue.component('tree-folder-contents', {
+            props: {
+                children: Array
+            },
+            template: `
+            <!--<div>-->
+                
+            
+                <ul>
+                    <li v-for="child in children">
+                        <tree-folder v-if="child.children" :folder="child"/>
+                        <span v-else>{{ child.name }}</span>
+                    </li>
+                </ul>
+                <!--< @click="update"></button>-->
+            <!--<div><-->
+            `,
+            // methods: {
+            //     update: function(){
+            //         this.$forceUpdate();
+            //     }
+            // }
+        });
+
+        const vm = new Vue({
+            el: "#app7",
+            data: {
+                children: [
+                    {
+                        id: 1,
+                        name: 'xxx'
+                    },
+                    {
+                        id: 2,
+                        name: 'zzz',
+                        children: [
+                            {
+                                id: 21,
+                                name: 'yyy'
+                            }
+                        ]
+                    }
+                ]
+            }
+        });
+        console.log(vm.children[3]);
+        vm.children[3] = { id: 3,name: 'ggg'}
+        // 内联模板  当当 inline-template 这个特殊的 attribute 出现在一个子组件上时，
+        // 这个组件将会使用其里面的内容作为模板，而不是将其作为被分发的内容
+        // 也就是说 模板可以不用定义任何东西 直接使用组件传递的内容
+        // 会让组件的作用域变复杂 少用此方式
+        Vue.component('my-component',{
+            template: ``
+        });
+
+        new Vue({ el: "#app8" });
+
+        // X-Template
+        // 在一个 <script> 元素中，并为其带上 text/x-template 的类型，然后通过一个 id 将模板引用过去
+        Vue.component('hello-world',{
+            template: '#hello-world-template'
+        });
+        new Vue({ el: "#app9"});
+        // 可以用于模板特别大的 demo 或极小型的应用，但是其它情况下请避免使用，因为这会将模板和该组件的其它定义分离开。
+
+        // 通过 v-once 创建低开销的静态组件
+        // 如果这个组件包含了大量的静态内容，可以使用v-once以确保这些内容只会被渲染一次然后缓存起来
+        // 不要过度使用这个模式。当你需要渲染大量静态内容时，极少数的情况下它会给你带来便利，除非你非常留意渲染变慢了，
+        // 不然它完全是没有必要的——再加上它在后期会带来很多困惑。例如，设想另一个开发者并不熟悉 v-once 或漏看了它在模板中，
+        // 他们可能会花很多个小时去找出模板为什么无法正确更新。
+    </script>
+
+</button>
+
+</div>

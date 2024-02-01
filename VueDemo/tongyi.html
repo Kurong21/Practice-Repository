@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Vue.js Nested List Component</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+    <div id="app">
+        <unique-name-of-my-component></unique-name-of-my-component>
+    </div>
+
+    <script>
+        Vue.component('unique-name-of-my-component',{
+            name: 'stack-overflow',
+            template: `
+                <ul>
+                    <li v-for="list in lists" :key="list.id">
+                        {{ list.name }}
+                        <stack-overflow v-if="list.childList && depth < maxDepth" :lists="list.childList" :depth="depth + 1"></stack-overflow>
+                    </li>
+                </ul>
+            `,
+            data: function(){
+                return {
+                    lists: [
+                        {
+                            id: 1,
+                            name: 'joins',
+                            childList: [
+                                {
+                                    id: 11,
+                                    name: 'join-jones'
+                                }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            name: 'james',
+                            childList: [
+                                {
+                                    id: 21,
+                                    name: 'james-brokers'
+                                },
+                                {
+                                    id: 22,
+                                    name: 'james-jannels',
+                                    childList: [
+                                        {
+                                            id: 221,
+                                            name: 'james-federations'
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: 3,
+                            name: 'durant',
+                        }
+                    ],
+                    depth: 0,
+                    maxDepth: 3
+                }
+            }
+        });
+
+        var app = new Vue({
+            el: '#app'
+        });
+    </script>
+</body>
+</html>

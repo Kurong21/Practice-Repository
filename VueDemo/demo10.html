@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>过渡效果</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
+    <!-- <style>
+        应用过渡
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity .5s;
+        }
+
+        .fade-enter,
+        .fade-leave-to
+        /* .fade-leave-active below version 2.1.8 */
+        {
+            opacity: 0;
+            color: aqua;
+        }
+    </style> -->
+
+    <style>
+        .container {
+            height: 100%;
+            text-align: center;
+        }
+
+        #app4 {
+            width: 100%;
+            height: 100px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert {
+            width: 200px;
+            height: 100px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: brown;
+            border-radius: 10px;
+        }
+
+        .close {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 70px;
+            height: 40px;
+            background-color: brown;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 0;
+        }
+
+        /* 应用动画 */
+        .bounce-enter-active {
+            animation: bounce-in .5s;
+        }
+
+        .bounce-leave-active {
+            animation: bounce-in .5s reverse;
+        }
+
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.5);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .toggle-enter-active {
+            animation: toggle-in 0.3s;
+        }
+
+        .toggle-leave-active {
+            animation: toggle-in 0.3s reverse;
+        }
+
+        @keyframes toggle-in {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            /* from {
+                opacity: 0;
+                transform: translateX(0px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-100px);
+            } */
+        }
+
+
+        .component-fade-enter-active, .component-fade-leave-active{
+            transition: opacity .5s ease;
+        }
+        .component-fade-enter, .component-fade-leave-to {
+            opacity: 0;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div id="app1">
+            <button @click="show= !show">Toggle</button>
+            <transition name="fade" enter-active-class="animated tada" leave-active-class="animated bounceOutRight">
+                <p v-if="show">hello</p>
+            </transition>
+        </div>
+
+        <div id="app2">
+            <button @click="show = !show">点击显示</button>
+            <transition name="bounce">
+                <p v-if="show">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </transition>
+        </div>
+
+        <div id="app3">
+            <transition name="example" enter-active-class="animated tada" leave-active-class="animated bounceOutRight">
+                <p v-if="show">Hello</p>
+            </transition>
+            <button @click="show = !show">点击显示</button>
+        </div>
+
+        <div id="app4">
+            <!-- 过渡模式 -->
+            <transition name="toggle" mode="out-in">
+                <!-- key值区分不同元素 -->
+                <button :key="docState" @click="docState = !docState">
+                    {{ buttonMessage }}
+                </button>
+            </transition>
+        </div><br>
+
+        <div id="app5">
+            <input type="radio" v-model="view" value="view-a" id="a" name="view">
+            <label for="a">A</label>
+            <input type="radio" v-model="view" value="view-b" id="b" name="view">
+            <label for="b">B</label>
+            <transition name="component-fade" mode="out-in">
+                <component :is="view"></component>
+            </transition>
+            <!-- <button @click="toggleComponent">切换组件</button> -->
+        </div>
+
+    </div>
+
+    <script>
+
+        new Vue({
+            el: "#app1",
+            data: {
+                show: true
+            }
+        })
+
+        // 上述demo提供了一个过渡效果 在这当中主要是控制类名实现过渡效果
+        // 当插入或删除包含在 transition 组件中的元素时，Vue 将会做以下处理：
+        // 1. vue会自动嗅探目标是否应用了CSS过渡或动画 如果是在恰当的时机添加/删除类名
+        // 2. 如果提供了js钩子函数，会在合适的时机调用函数
+        // 3. 如果这二者都没有 则DOM操作在下一帧中立即执行
+
+        // 在 进入/离开 的过程中，会有6个class的切换
+        // v-enter: 定义进入过渡的开始状态
+        // v-enter-active: 元素进入过渡生效时的状态
+        // v-enter-to: 定义进入过渡的结束状态
+        // v-leave：定义离开过渡的开始状态。
+        // v-leave-active：定义离开过渡生效时的状态。
+        // v-leave-to：2.1.8 版及以上定义离开过渡的结束状态。
+
+        // 对于这些在过渡中切换的类名来说，如果你使用一个没有名字的 <transition>，
+        // 则 v- 是这些类名的默认前缀。如果你使用了 <transition name="my-transition">
+        // 那么 v-enter 会替换为 my-transition-enter。
+
+        new Vue({
+            el: "#app2",
+            data: {
+                show: false,
+            },
+        });
+
+        new Vue({
+            el: "#app3",
+            data: {
+                show: true,
+            }
+        });
+
+        // 多个元素的过渡
+        // 使用key attribute 设置唯一的值来标记 让vue区分相同的标签名元素 否则 vue指挥替换标签内部内容
+
+        // 过渡模式
+        // 默认模式下 下面示例的进入动画和离开动画同时进行
+        // 如果加了绝对定位 就是正常的
+        // 两种过渡模式：
+        // in-out：新元素先进行过渡，完成之后当前元素过渡离开。 视觉上只会看见一个状态的元素
+        // out-in：当前元素先进行过渡，完成之后新元素过渡进入。 视觉上会同时看见两个状态的元素 (不常用)
+        new Vue({
+            el: "#app4",
+            data: {
+                docState: true,
+            },
+            computed: {
+                buttonMessage: function() {
+                    switch (this.docState) {
+                        case true:
+                            return "On the Way";
+                        case false:
+                            return "Off The Way";
+                    }
+                }
+            }
+        });
+
+        // 多个组件的过渡
+        new Vue({
+            el: "#app5",
+            data: {
+                view: 'view-a',
+            },
+            components: {
+                'view-a': {
+                    template: `
+                        <p>Hello Component a</p>
+                    `
+                },
+                'view-b': {
+                    template: `
+                        <p>Hello Component b</p>
+                    `
+                }
+            },
+            // methods: {
+            //     toggleComponent: function(){
+            //         this.view = 'view-b';
+            //     }
+            // }
+        })
+    </script>
+
+</body>
+
+</html>

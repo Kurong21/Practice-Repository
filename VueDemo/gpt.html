@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue Transition with Key</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <style>
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 1s;
+    }
+
+    .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+      opacity: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <transition>
+      <button :key="docState" @click="toggleDocState">
+        {{ buttonMessage }}
+      </button>
+    </transition>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        docState: 'saved',
+      },
+      computed: {
+        buttonMessage: function () {
+          switch (this.docState) {
+            case 'saved': return 'Edit';
+            case 'edited': return 'Save';
+            case 'editing': return 'Cancel';
+          }
+        },
+      },
+      methods: {
+        toggleDocState() {
+          switch (this.docState) {
+            case 'saved':
+              this.docState = 'editing';
+              break;
+            case 'edited':
+              this.docState = 'saved';
+              break;
+            case 'editing':
+              this.docState = 'edited';
+              break;
+          }
+        },
+      },
+    });
+  </script>
+
+</body>
+
+</html>

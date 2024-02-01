@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <head name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>插槽</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+        
+        <style>
+            .table{
+                display: flex;
+            }
+            .style{
+                margin-left: 10px;
+            }
+        </style>
+
+    </head>
+<body>
+    <div id="app1">
+        <slotfather-component></slotfather-component><br />
+    </div>
+
+    <div id="app2">
+        <!--同一个组件使用不同名字的插槽 显示不同的内容 -->
+        <header-compnent>
+            <template v-slot:header>
+                <h1>Here might be a page title</h1>
+            </template>
+        </header-compnent>
+        <header-compnent>
+            <template v-slot:header1>
+                <h1>This is another title</h1>
+            </template>
+        </header-compnent>
+
+        <content-compnent>
+            <template v-slot:content>
+                <p>A paragraph for the main content.</p>
+                <p>And another one.</p>
+            </template>
+        </content-compnent>
+        <footer-compnent>
+            <template v-slot:footer>
+                <p>Here's some contact info</p>
+            </template>
+        </footer-compnent>
+    </div>
+
+    <div id="app3">
+        <base-component>
+            <template v-slot:header>
+                <h1>这是标题</h1>
+            </template>
+            <template v-slot:main>
+                <p>这是内容</p>
+            </template>
+            <template v-slot:footer>
+                <h2>这是页脚</h2>
+            </template>
+        </base-component>
+    </div>
+
+    <div id="app4">
+        <current-user>
+            <template v-slot="{ user = { lastName: 'default name'} }">
+                {{ user.lastName }}
+            </template>
+        </current-user>
+    </div>
+
+    <div id="app5">
+        <dynamic-bind :slot-message="text">
+            <template v-slot:[text]>
+                <p>动态绑定插槽名</p>
+            </template>
+        </dynamic-bind>
+    </div>
+
+    <div id="app6">
+        <todo-list>
+            <!-- 父级组件使用v-slot指令接收 -->
+            <!-- 默认 -->
+            <!-- <template v-slot="slotProps">
+                <span v-if="slotProps.todos.isComplete">✓</span>
+                {{ slotProps.todos.text }}
+            </template> -->
+            <!-- 解构props -->
+            <template v-slot="{ todos }">
+                <span v-if="todos.isComplete">✓</span>
+                {{ todos.text }}
+            </template>
+        </todo-list>
+    </div>
+
+    <div id="app7">
+        <user-component>
+            <template v-slot="slotProps">
+                {{ slotProps.user.firstName }}
+            </template>
+        </user-component>
+    </div>
+
+    <div id="app8">
+        <my-table :list="list">
+            <template>
+                {{ list[0].name }}
+            </template>
+        </my-table>
+    </div>
+
+    <script>
+        // 插槽
+        Vue.component('slot-component', {
+            data: function () {
+                return {
+                    childValue: "作用域之外"
+                }
+            },
+            template: `
+                <div>
+                    <h1>这周的天气真是好</h1>
+                    <slot>Submit</slot>
+                </div>
+            `
+        });
+        Vue.component('slotfather-component', {
+            data: function () {
+                return {
+                    value: "插槽数据"
+                }
+            },
+            // 如果插槽内没有内容  就会使用slot标签中的默认内容 否则不会使用
+            template: `
+                <div>
+                    <p>使用插槽分发内容</p>
+                     <slot-component>
+                       <p>
+                            这不是默认显示内容
+                       </p>
+                    </slot-component>
+                </div>
+            `
+        });
+        new Vue({ el: "#app1" });
+        // 插槽数据作用域
+        // 父级模板里的所有内容都是在父级作用域中编译的；子模板里的所有内容都是在子作用域中编译的。
+        // 默认内容： <slot>Submit</slot> 在slot标签中添加内容  如果没有提供任何插槽内容时 就会显示
+
+        // 具名插槽： 有名字的插槽 当在一个模板内需要多个插槽的时候
+        Vue.component('header-compnent', {
+            template: `
+                <div>
+                    <p>这是头部</p>
+                    <slot name="header"></slot>
+                    <slot name="header1"></slot>
+                </div>
+            `
+        });
+        Vue.component('content-compnent', {
+            template: `
+                <div>
+                    <p>这是内容</p>
+                    <slot name="content"></slot>
+                </div>
+            `
+        });
+        Vue.component('footer-compnent', {
+            template: `
+                <div>
+                    <p>这是页脚</p>
+                    <slot name="footer"></slot>
+                </div>
+            `
+        });
+
+        // Vue.component('father-content',{
+        //     template: `
+        //         <div>
+        //             <header-compnent>ffd</header-compnent>
+        //             <content-compnent>fdfdf</content-compnent>
+        //             <footer-compnent>fdfdf</footer-compnent>
+        //         </div>
+        //     `
+        // })
+        new Vue({
+            el: "#app2"
+        });
+
+        // 具名插槽总结： 在组件内部定义插槽 然后通过不同的名字显示不同的内容
+
+        Vue.component('base-component', {
+            template: `
+                <div class="container">
+                    <header>
+                        <slot name="header"></slot>
+                    </header>
+                    <main>
+                        <slot name="main"></slot>
+                    </main>
+                    <footer>
+                        <slot name="footer"></slot>
+                    </footer>
+                </div>
+            `
+        });
+        new Vue({ el: "#app3" });
+
+        // 插槽内容访问子组件中的数据
+        Vue.component('current-user', {
+            data: function () {
+                return {
+                    user: undefined // 当slotProps是undefined的时候 就是启用默认内容
+                }
+            },
+            template: `
+                <span>
+                    <slot :user="user">
+                        {{ user.firstName }}
+                    </slot>    
+                </span>
+            `
+        });
+        new Vue({ el: "#app4" });
+        // 为了能让数据在父级插槽中可用 使用v-slot:default="slotProps"来给父级插槽传递子组件的值
+        // 腹肌插槽中使用： slotProps.user.firstName  slotProps是自己定义的属性名
+        // 如果是具名插槽 就将default换为插槽名
+
+        // 独占默认插槽的缩写语法
+        // 当提供的内容只有默认插槽时，组件的标签才可以被当作插槽的模板来使用
+        // 将v-slot指令放在组件标签上
+        // <current-user v-slot="slotProps">
+        //   {{ slotProps.user.firstName }}
+        // </current-user>
+
+        // 不能和具名插槽混用 这会导致作用域不明确
+
+        // 解构插槽prop
+        // 作用域插槽的内部工作原理就是：将插槽内容包裹在一个拥有单个参数的函数里面
+        // function (slotProps) {  插槽内容 }
+
+        // 所以v-slot的值实际上可以是任何能够作为函数定义中的参数的js表达式 所以上述用法：
+        // <current-user v-slot="{ user }">
+        //   {{ user.firstName }}
+        // </current-user>
+
+        // 动态插槽名 使用v-bind绑定动态插槽名
+        Vue.component('dynamic-bind', {
+            props: {
+                slotMessage: String
+            },
+            // data: function(){
+            //     return {
+            //         slotMessage: 'dynamic'
+            //     }
+            // },
+            template: `
+                <span>
+                    <slot :name="slotMessage">默认内容</slot>
+                </span>
+            `
+        });
+        new Vue({
+            el: "#app5",
+            data: {
+                text: 'dynamic'
+            }
+        });
+        // 使用props传值 插槽名在父组件上被改变 然后将值传给子组件 子组件更新绑定的插槽名
+
+        // 具名插槽的缩写  v-slot:header 可以被重写为 #header
+
+        // 应用 插槽 prop 允许我们将插槽转换为可复用的模板 这些模板可以基于输入的 prop 渲染出不同的内容
+        Vue.component('todo-list', {
+            template: `
+                <ol>
+                    <li
+                        v-for="todo in todos"
+                        :key="todo.id"
+                    >
+                    <!-- 给每个插槽绑定一个todo对象,作为值传入父级组件 -->
+                    <slot :todos="todo">
+                    </slot>
+                    </li>
+                </ol>
+            `,
+            data: function () {
+                return {
+                    todos: [
+                        {
+                            id: 1,
+                            text: 'learn vue',
+                            isComplete: true
+                        },
+                        {
+                            id: 2,
+                            text: 'find a job',
+                            isComplete: true
+                        },
+                        {
+                            id: 3,
+                            text: 'make money',
+                            isComplete: false
+                        }
+                    ]
+                }
+            }
+        });
+        new Vue({
+            el: "#app6",
+        });
+
+        Vue.component("user-component", {
+            template: `
+                <span>
+                    <slot :user="user">
+                        {{ user.lastName }}
+                    </slot>    
+                </span>
+            `,
+            data: function () {
+                return {
+                    user: {
+                        firstName: 'John',
+                        lastName: 'Jack'
+                    }
+                }
+            }
+        });
+        new Vue({ el: "#app7" });
+
+        // 当使用插槽的时候，插槽内容如何获取子组件中的数据
+        // 在插槽上动态绑定值 插槽内容使用值的时候使用v-slot:插槽名="值"，没有插槽名使用v-slot:default="值"或者省略v-slot="值"
+        // 插槽的作用是：为了让组件的使用者传入不同的html结构  起到更好的复用效果
+        // 作用域插槽的数据流向：子组件(组件) ---> 父组件(组件使用者)
+
+        Vue.component('myTable', {
+            props: {
+                list: Array,
+                prop: String,
+                lable: String
+            },
+            template: `
+                <div class="style">
+                    <table cellspacing="0">
+                        <myTable-column
+                            prop="name"
+                            lable="姓名"
+                        >
+                        </myTable-column>
+                        <myTable-column
+                            prop="sex"
+                            lable="性别"
+                        >
+                        </myTable-column>
+                    </table>
+                </div>
+            `
+        });
+        Vue.component('myTable-column', {
+            props: {
+                prop: String,
+                lable: String
+            },
+            template: `
+                <div class="table">
+                    <th>
+                        {{ lable }}
+                    </th>
+                    <tr
+                        v-for="(item,index) in $parent.list"
+                        :key="index"
+                    >
+                    {{ item[prop] }}
+                    </tr>
+                </div>
+            `
+        });
+
+        new Vue({ 
+            el: "#app8",
+            data: {
+                list: [
+                    {
+                        name: '牛儿',
+                        sex: 1
+                    },
+                    {
+                        name: '羊儿',
+                        sex: 2
+                    },
+                    {
+                        name: '猪儿',
+                        sex: 1
+                    }
+                ]
+            }
+        })
+    </script>
+</body>
+
+</html>

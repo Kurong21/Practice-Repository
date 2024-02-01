@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>条件渲染</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+</head>
+
+<body>
+    <div id="app1">
+        <p v-if="isTrue">条件渲染</p>
+        <p v-else>上面不显示则显示这里😄</p>
+
+        <!-- 把一个 <template> 元素当做不可见的包裹元素，并在上面使用 v-if。最终的渲染结果将不包含 <template> 元素。 -->
+        <template v-if="ok">
+            <h1>Title</h1>
+            <p>Paragraph 1</p>
+            <p>Paragraph 2</p>
+        </template>
+
+        <!-- v-else 元素必须紧跟在带 v-if 或者 v-else-if 的元素的后面，否则它将不会被识别。 -->
+        <div v-if="num">
+            Now you see me
+        </div>
+        <div v-else>
+            Now you don't
+        </div>
+
+        <!-- v-else-if 充当else if 可以连续使用 -->
+        <div v-if="false">A</div>
+        <div v-else-if="false">B</div>
+        <div v-else-if="true">C</div>
+        <div v-else>D</div>
+
+        <h1 v-show="Math.random() > 0.5">条件渲染v-show</h1>
+        <template v-if="Math.random() > 0.5">
+            <p>条件渲染v-if</p>
+        </template>
+    </div>
+
+    <div id="app2">
+        <label>{{ loginType }}</label><br>
+        <template v-if="loginType === 'username'"><br>
+            <input placeholder="Enter your username" key="username-input"><br>
+        </template>
+
+        <template v-else><br>
+            <input placeholder="Enter your email" key="email-input"><br>
+        </template><br>
+
+        <button @click="switchType">点击切换登录方式</button>
+
+    </div>
+
+    <ul id="app3">
+        <li v-for="item in source" :key="item.name">{{ item.name }} -- {{ item.age }} -- {{ item.gender }}</li>
+    </ul>
+
+    <ul id="app4">
+        <li v-for="(item,index) in items">{{ parentMsg }} - {{ index }} - {{ item.name }}</li>
+    </ul>
+
+    <ul id="app5">
+        <!-- <li v-for="value in object">{{ value }}</li> -->
+        <!-- 使用简键名 -->
+        <li v-for="(value,name) in object">{{ name }} : {{ value }}</li>
+    </ul>
+
+    <div id="app6">
+        <ul>
+            <li v-for="item in items" :key="item.name">{{ item.name }} -- {{ item.age }}</li>
+        </ul>
+        <button @click="Mysort('age')">按年龄排序</button>
+        <button @click="Mysort('name')">按姓名排序</button>
+        <p>{{ obj.b }}</p>
+        <p v-for="(value,name) in obj">{{ name }}</p>
+    </div>
+
+    <div id="app7">
+        <ul>
+            <li v-for="value in items">{{ value }}</li>
+        </ul>
+    </div>
+
+    <div id="app8">
+        <p>{{ message }}</p>
+        <button @click="change">点击更改</button>
+    </div>
+
+    <div id="app9">
+        <p>{{ message }}</p>
+        <button @click="change">点击更改</button>
+    </div>
+
+    <div id="app10">
+        <example></example>
+    </div>
+
+    <div id="app11">
+        <ul>
+            <li v-for="n in evenNumbers"> {{ n }}</li>
+        </ul>
+    </div>
+
+    <div id="app12">
+        <ul v-for="set in sets">
+            <li v-for="n in even(set)">{{ n }}</li>
+        </ul>
+    </div>
+
+    <ul id="app13">
+        <li v-for="todo in todos" v-if="todo.isComplated">{{ todo.title }}</li>
+    </ul>
+
+    <div id="app14">
+        <form v-on:submit.prevent="addNew">
+            <label for="new-todo">Add to do</label>
+            <input type="text" v-model="newtodo" id="new-todo" placeholder="E.g. Feed the cat">
+            <button>add</button>
+        </form>
+        <ul>
+            <li v-for="(todo,index) in todos" :key="todo.id" :title="todo.title">{{ todo.title }}<button
+                    @click="todos.splice(index,1)">remove</button></li>
+        </ul>
+    </div>
+
+    <script>
+
+        // 条件渲染 v-if 指令用于有条件性的渲染一块内容 在表达式的值为真值的时候才被渲染
+        const app1 = new Vue({
+            el: "#app1",
+            data: {
+                isTrue: false,
+                ok: true
+            },
+            computed: {
+                num: function () {
+                    return Math.random() > 0.5;
+                }
+            }
+        })
+
+        // Vue 会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染  有些时候我们希望它不要复用已有元素
+        // 用 key 来管理可复用元素 key="..." 表达“这两个元素是完全独立的，不要复用它们”
+        // 在app2中 如果不加key属性 在你切换登录方式后 输入框里面的值将不会被清除 
+        // 因为两个模板使用了相同的元素 <input> 不会被替换掉——仅仅是替换了它的 placeholder
+        const app2 = new Vue({
+            el: "#app2",
+            data: {
+                loginType: "username",
+            },
+            methods: {
+                switchType: function () {
+                    this.loginType = this.loginType === "username" ? "email" : "username"
+                }
+            }
+        })
+
+        // 条件渲染 v-show 也是根据条件展示元素 用法和v-if大致一样
+        // 不同的是 带有v-show指令的元素 会一直保留在DOM 中 它只是简单的切换元素的display属性 在元素上添加了样式：display: none;
+        // 且v-show 不支持 <template> 元素 也不支持 v-else
+        //  v-if 是“真正”的条件渲染，因为它会确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建。
+        // 惰性的：在初始渲染条件为假时，它什么也不会做 直到条件为真时
+        // v-show 则是无论初始条件是什么 元素总是会被渲染  并指示简单的基于css切换
+        // 如何选择：
+        // 一般来说，v-if 有更高的切换开销，而 v-show 有更高的初始渲染开销。
+        // 因此，如果需要非常频繁地切换，则使用 v-show 较好；如果在运行时条件很少改变，则使用 v-if 较好
+
+        // 不推荐 v-if 和 v-for 一起使用，v-for 比 v-if 有更高的优先级
+
+
+        // 列表渲染
+        // 使用 v-for 指令基于一个数组来渲染列表 需要使用 item in items 的特殊语法 items是源数组数据 item则是被迭代的数组元素别名
+
+        const app3 = new Vue({
+            el: "#app3",
+            data: {
+                source: [
+                    {
+                        name: "Tom",
+                        age: 20,
+                        gender: "M"
+                    },
+                    {
+                        name: "Jerry",
+                        age: 24,
+                        gender: "F"
+                    },
+                    {
+                        name: "Jack",
+                        age: 27,
+                        gender: "M"
+                    }
+                ]
+            }
+        });
+
+        // 在 v-for 块中，我们可以访问所有父作用域的 property。v-for 还支持一个可选的第二个参数，即当前项的索引。
+        // 也可以用 of 替代 in 作为分隔符，因为它更接近 JavaScript 迭代器的语法
+        // <div v-for="item of items"></div>
+        const app4 = new Vue({
+            el: "#app4",
+            data: {
+                parentMsg: "prantMessage",
+                items: [
+                    {
+                        name: "Tom",
+                        age: 20,
+                        gender: "M"
+                    },
+                    {
+                        name: "Jerry",
+                        age: 24,
+                        gender: "F"
+                    },
+                    {
+                        name: "Jack",
+                        age: 27,
+                        gender: "M"
+                    }
+                ]
+            }
+        });
+
+        // v-for 遍历对象的属性property
+        const app5 = new Vue({
+            el: "#app5",
+            data: {
+                object: {
+                    title: 'How to do lists in Vue',
+                    author: 'Jane Doe',
+                    publishedAt: '2016-04-10'
+                }
+            }
+        })
+
+        // 排序
+        const app6 = new Vue({
+            el: "#app6",
+            data: {
+                items: [
+                    {
+                        name: "Tom",
+                        age: 25,
+                        gender: "M"
+                    },
+                    {
+                        name: "Jerry",
+                        age: 24,
+                        gender: "F"
+                    },
+                    {
+                        name: "Aack",
+                        age: 27,
+                        gender: "M"
+                    }
+                ],
+                obj: {
+                    a: 1
+                }
+            },
+            methods: {
+                Mysort: function (prop) {
+                    this.items.sort((a, b) => a[prop] > b[prop] ? 1 : -1);
+                }
+            }
+        });
+
+        // 替换数组  对数组使用变更方法，会改变原始数组  这时可以就使用改变之后的数组
+        app6.items = app6.items.filter(item => {
+            return item.age >= 25;
+        });
+        // 过滤原始数组之后 依然会实时更新
+
+        // 检测变化的注意事项 由于 JavaScript 的限制，Vue 不能检测数组和对象的变化
+        // 对于对象 Vue无法监测对象属性的添加或者移除
+        // 对于已经创建的实例，Vue 不允许动态添加根级别的响应式 property 所以必须在初始化实例之前声明所有根级响应式属性 哪怕是一个空值
+        // app6.someObject = {  报错
+        //     a: 1,
+        //     b: 2
+        // };
+        // 可以使用：Vue.set(object, propertyName, value)向嵌套对象添加响应式 property
+        Vue.set(app6.obj, 'b', 4);
+        // 添加多个属性
+        app6.obj = Object.assign(app6.obj, { c: 1, d: 2 });
+        // app6.obj = Object.assign({},app6.obj,{ c: 1, d: 2});
+
+        // 对于数组
+        // Vue 不能检测以下数组的变动：
+        // 1. 利用索引直接设置一个数组选项时 vm.items[indexOfItem] = newValue
+        // 2. 当你修改数组的长度时，vm.items.length = newLength
+
+        const app7 = new Vue({
+            el: "#app7",
+            data: {
+                items: [
+                    "tam",
+                    "tad",
+                    "tay"
+                ]
+            }
+        });
+        // app7.items.length = 2; // 不是响应式 不会被渲染
+        // 如何解决：使用Array.prototype.splice
+        app7.items.splice(2); // 响应式 重新渲染数据
+
+        // app7.items[1] = "tnnd"; // 不是响应式 不会被渲染
+        // 如何解决： 使用Vue.set(修改源数据数组，要修改的索引，新的值)方法
+        Vue.set(app7.items, 1, "tnnd"); // 响应式 重新被渲染
+
+        // Vue在更新DOM时是异步进行的 只要侦听到数据变化，Vue 将开启一个队列，并缓冲在同一事件循环中发生的所有数据变更
+        // Vue.nextTick(callback)
+        const app8 = new Vue({
+            el: "#app8",
+            data: {
+                message: "更改之前"
+            },
+            methods: {
+                change: function () {
+                    this.message = "Welcome";
+                    let dom = document.querySelector("#app8");
+                    console.log(dom.textContent); // 打印 更改之前
+                    if (dom.textContent === "更改之前 点击更改") {
+                        console.log("文本data被修改后dom内容没立即更新");
+                    } else {
+                        console.log("文本data被修改后dom内容被马上更新了");
+                    }
+                }
+            }
+        });
+
+        const app9 = new Vue({
+            el: "#app9",
+            data: {
+                message: "更改之前"
+            },
+            methods: {
+                change: function () {
+                    this.message = "Welcome Vue";
+
+                    Vue.nextTick(function () {
+                        // app8.$el.textContent = "更改之后111"; // 更改成功
+                        let dom = document.querySelector("#app9");
+                        console.log(dom.textContent); // 打印 Welcome Vue
+                        if (dom.textContent === "更改之前 点击更改") {
+                            console.log("文本data被修改后dom内容没立即更新");
+                        } else {
+                            console.log("文本data被修改后dom内容被马上更新了");
+                        }
+                    });
+                }
+            }
+        })
+        // Vue.nextTick(callback)总结：
+        // 在app8中messages被更改之后 但是DOM并没有马上更新，获取的DOM不是最新的 打印的还是原始值
+        // 但是在app9中 messages被更改之后，将DOM操作包裹在nextTick方法中 DOM马上进行了更新 此时是最新的DOM 所以打印的是修改后的值
+
+        // 在组件内使用 vm.$nextTick() 实例方法特别方便，因为它不需要全局 Vue，并且回调函数中的 this 将自动绑定到当前的 Vue 实例上
+
+        Vue.component('example', {
+            // template: "<p>{{ message }}</p>",
+            template: '<button v-on:click="upDateMessage">{{ message }}</button>',
+            data() {
+                return {
+                    message: "组件内使用"
+                }
+            },
+            methods: {
+                upDateMessage: function () {
+                    this.message = "组件内修改值";
+                    console.log(this.$el.textContent);
+                    console.log(this);
+                    this.$nextTick(function () {  // 此时this指向这个vue实例
+                        console.log(this.$el.textContent)
+                    });
+                }
+            }
+        });
+        const app10 = new Vue({ el: "#app10", });
+
+        // 显示过滤/排序后的结果 不更改或重置原始数据的前提下
+        // 创建计算属性 返回过滤/ 排序后的数组
+        const app11 = new Vue({
+            el: "#app11",
+            data: {
+                numbers: [1, 3, 5, 67, 23, 88, 21, 20]
+            },
+            computed: {
+                evenNumbers: function () {
+                    return this.numbers.filter(function (item) {
+                        return item % 2 === 0; // 过滤掉奇数
+                    });
+                    // return this.numbers.sort((a,b) => a - b); // 排序
+                }
+            }
+        });
+
+        // 计算属性不使用的情况: 嵌套循环  使用method
+        const app12 = new Vue({
+            el: "#app12",
+            data: {
+                sets: [[1, 3, 5, 67, 23, 32, 21, 20], [1, 3, 5, 67, 23, 88, 21, 12]]
+            },
+            methods: {
+                even: function (numbers) {
+                    return numbers.filter(function (number) {
+                        return number % 2 === 0
+                    })
+                    // return numbers.sort((a,b) => a - b); //会导致无限循环
+                }
+            }
+        });
+
+        const arr = [[1, 3, 5, 67, 23, 32, 21, 20], [1, 3, 5, 67, 23, 88, 21, 12]];
+        for (var i = 0; i < arr.length; i++) {
+            for (var j = 0; j < arr[i].length; j++) {
+                arr[i].sort(function (a, b) {
+                    return a - b;
+                })
+            }
+        }
+        console.log(arr);
+
+        // 不推荐在同一元素上使用 v-if 和 v-for 当它们处于同一节点，v-for 的优先级比 v-if 更高，
+        // 这意味着 v-if 将分别重复运行于每个 v-for 循环中
+
+        // 渲染部分项节点  只有当isComplated为true时才会渲染
+        const app13 = new Vue({
+            el: "#app13",
+            data: {
+                todos: [
+                    { title: "work", isComplated: true },
+                    { title: "game", isComplated: true },
+                    { title: "eat", isComplated: true },
+                    { title: "sleep", isComplated: false }
+                ],
+            }
+        });
+        // 如果是有目的的跳过循环的话 可以将v-if 放在外层元素上 或template元素上
+
+        // 实例
+        const app14 = new Vue({
+            el: "#app14",
+            data: {
+                newtodo: '',
+                todos: [
+                    {
+                        id: 1,
+                        title: 'Do the dishes',
+                    },
+                    {
+                        id: 2,
+                        title: 'Take out the trash',
+                    },
+                    {
+                        id: 3,
+                        title: 'Mow the lawn'
+                    }
+                ],
+                nextId: 4
+            },
+            methods: {
+                addNew: function() {
+                    this.todos.push({
+                        id: this.todos.length + 1,
+                        title: this.newtodo
+                    });
+                    this.newtodo = '';
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

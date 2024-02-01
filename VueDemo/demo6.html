@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组件</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <style>
+        .tab-button {
+            padding: 6px 10px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background: #f0f0f0;
+            margin-bottom: -1px;
+            margin-right: -1px;
+        }
+
+        .tab-button:hover {
+            background: #e0e0e0;
+        }
+
+        .tab-button.active {
+            background: #e0e0e0;
+        }
+
+        .tab {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app1">
+        <button-counter></button-counter>
+    </div>
+
+    <div id="app2">
+        <blog-post title="biaoti"></blog-post>
+    </div>
+
+    <div id="app3">
+        <blog title="My journey with Vue"></blog>
+        <blog title="Blogging with Vue"></blog>
+        <blog title="Why Vue is so fun"></blog>
+    </div>
+
+    <div id="app4">
+        <blog-data v-for="post in posts" :key="post.id" :title="post.title"></blog-data>
+    </div>
+
+    <div id="app5" :style="{ fontSize: postFontSize + 'em' }">
+        <elements v-for="post in posts" v-bind:post="post" v-bind:key="post.id" v-on:enlarge-text="postFontSize += 0.1">
+            <!-- v-on:enlarge-text="postFontSize += $event"> -->
+            <!-- v-on:enlarge-text="enlarge"> -->
+        </elements>
+    </div>
+
+    <div id="interaction">
+        <father-compoent></father-compoent>
+    </div>
+
+    <div id="app7">
+        <alert-box></alert-box>
+    </div>
+
+    <div id="dynamic-component-demo" class="demo">
+        <button 
+            v-for="tab in tabs" 
+            v-bind:key="tab"
+            v-bind:class="['tab-button',{ active: currentTab === tab }]"
+            v-on:click="currentTab = tab">
+            {{ tab }}
+        </button>
+        <component v-bind:is="currentTabComponent"></component>
+    </div>
+
+    <script>
+        // 关闭生产环境提示
+        Vue.config.productionTip = false;
+
+        // 定义组件 组件是可复用的Vue实例 且带有名字  它们接受相同的选项，例如data method computed watchd等 除了el根实例特有的选项
+        Vue.component('button-counter', {
+            data: function () {
+                return {
+                    count: 0
+                }
+            },
+            template: '<button @click="count++">你点击了{{ count }} 次</button>'
+        });
+
+        // 创建实例 注册组件
+        const app1 = new Vue({ el: "#app1", })
+
+        // 组件复用 可以将组件进行任意次数的复用  且它们都是独立的 不同的Vue实例 每用一次组件，就会有一个它的新实例被创建
+
+        // 选项
+        // data选项 ： 必须是一个函数 每个实例可以维护一份被返回对象独立的拷贝  保证了数据互相不干扰
+
+        // 组件的注册 
+        // 全局注册: 全局注册的组件可以用在其被注册之后的任何 (通过 new Vue) 新创建的 Vue 根实例
+        // 局部注册 
+
+        // 通过 Prop 向子组件传递数据 Prop 是你可以在组件上注册的一些自定义 attribute。
+        // 当一个值传递给一个 prop attribute 的时候，它就变成了那个组件实例的一个 property。
+
+        Vue.component("blog-post", {
+            props: ['title'],
+            template: '<h2>{{ title }}</h2>'
+        });
+
+        const app2 = new Vue({ el: "#app2" });
+
+        Vue.component('blog', {
+            props: ['title'],
+            template: '<h2>{{ title }}</h2>' // title="My journey with Vue"里面的值传到了 {{ title }}里面
+        });
+        const app3 = new Vue({
+            el: "#app3",
+        });
+
+        Vue.component("blog-data", {
+            props: ['title'],
+            template: '<h3>{{ title }}</h3>'
+        });
+        const app4 = new Vue({
+            el: "#app4",
+            data: {
+                posts: [
+                    { id: 1, title: 'My journey with Vue' },
+                    { id: 2, title: 'Blogging with Vue' },
+                    { id: 3, title: 'Why Vue is so fun' }
+                ]
+            }
+        });
+
+        // 单个根元素 
+        Vue.component('elements', {
+            props: ['post'],
+            template: `
+                    <div class="blog-post">
+                    <h3>{{ post.title }} === {{ post.type }}</h3>
+                    <button v-on:click="$emit('enlarge-text',0.1)">Enlarge text</button>
+                    <div v-html="post.content"></div>
+                    </div>
+            `
+        });
+        const app5 = new Vue({
+            el: "#app5",
+            data: {
+                posts: [
+                    { id: 1, title: 'My journey with Vue', content: "<span>fdsdfdsf</span>", type: "text" },
+                    { id: 2, title: 'Blogging with Vue', content: "feffefe" },
+                    { id: 3, title: 'Why Vue is so fun', content: "rwerwr" }
+                ],
+                postFontSize: 1
+            },
+            methods: {
+                enlarge: function (param) {
+                    this.postFontSize = this.postFontSize + 0.1;
+                    console.log(this.postFontSize);
+                    // console.log(param);
+                }
+            }
+        });
+
+        // 监听子组件事件
+        // 在父级组件内 使用 v-on来监听子组件实例的任意事件
+        // 本例中：v-on:enlarge-text="postFontSize += 0.1">
+        // 在子组件内通过调用内建的 $emit 方法并传入事件名称来触发一个事件
+        // 在本例中： v-on:click="$emit('enlarge-text')"
+
+
+        // 也可以通过在实例中定义方法
+        // 在本例中  通过在父组件上监听 v-on:enlarge-text="enlarge"
+        // 随后在实例中定义方法enlarge 也可实现
+
+        // 使用事件抛出一个值  用$emit的第二个参数实现
+        // 在本例中: <button v-on:click="$emit('enlarge-text', 0.1)">  抛出了一个值0.1
+        // 然后在实例方法中接受 并使用
+        // 本例中: console.log(param);打印0.1  表示使用时间抛出的值
+
+        // 同时 在父组件监听的时候 通过$event访问到被抛出的这个值
+        // 在本例中: v-on:enlarge-text="postFontSize += $event">
+
+        // 在组件上使用 v-model
+
+        // 关于组件传值
+        // 父组件向子组件传值： 使用props实现
+        // 具体实现： 在子组件内定义props 并给子组件添加动态绑定的prop名 然后在父组件内定义要传递的值
+            
+        // 子组件向父组件传值： 使用自定义事件实现
+        // 具体实现： 在子组件内定义要传递的值 在子组件内自定义一个事件使用this.$emit('inputHander',this.sendMessage)
+        // 将值传递给自定义事件inputHander
+        // 在子组件上监听自定义事件  并将结果传递给父组件上的方法  最后将父组件上定义的接受值赋值为传过来的值
+        // 父组件
+        Vue.component('father-compoent',{
+            data: function(){
+                // 在父组件内 定义要传递的值
+                return {
+                    name: "父组件向子组件传值",
+                    msg: ""
+                }
+            },
+            template: `
+                <div>
+                    <p>我是父组件</p>
+                    <p>这是子组件传递过来的值：{{ msg }}</p>
+                    <!-- 在子组件上动态绑定prop名 -->
+                    <child-compoent :name="name" v-on:inputHander="getMessage"></child-compoent>
+                </div>
+            `,
+            methods: {
+                getMessage: function (data) {
+                    // console.log(data);
+                    this.msg = data;
+                }
+            }
+        });
+
+        Vue.component('child-compoent',{
+            // 子组件内定义prop名
+            props: ['name'],
+            // 定义要向父组件传递的值
+            data: function(){
+                return {
+                    sendMessage: ""
+                }
+            },
+            template: `
+                <div>
+                    <p>我是子组件</p>
+                    <input type="text" v-model="sendMessage" v-on:input="messagehander">
+                    <p>这里是父组件传过来的值: {{ name }}</p>
+                </div>
+            `,
+            methods: {
+                messagehander: function(){
+                    this.$emit('inputHander',this.sendMessage);
+                },
+            }
+        });
+
+        new Vue({ el: "#interaction" })
+
+
+        // 在组件上使用 v-model v-model等价于v-bind：value 和v-on：input
+
+        // 通过插槽分发内容
+        Vue.component('alert-box', {
+            template: `<div class="demo-alert-box">
+                    <strong>Error!</strong>
+                    <slot></slot>
+                    </div>`
+        });
+
+        const app7 = new Vue({
+            el: "#app7",
+        });
+
+
+        // 动态组件
+        Vue.component('tab-home',{
+            template: "<div>Home component</div>"
+        });
+        Vue.component('tab-posts',{
+            template: "<div>Posts component</div>"
+        });
+        Vue.component('tab-archive',{
+            template: "<div>Archive component</div>"
+        });
+
+        new Vue({
+            el: "#dynamic-component-demo",
+            data: {
+                tabs: [
+                    "Home", "Posts", "Archive"
+                ],
+                currentTab: "Home"
+            },
+            computed: {
+                currentTabComponent:function (){
+                    return "tab-" + this.currentTab.toLowerCase();
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

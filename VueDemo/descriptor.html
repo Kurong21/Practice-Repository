@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于属性描述符</title>
+</head>
+<body>
+    <script>
+
+        var obj = {
+            a: 1,
+            b: 2
+        }
+
+        Object.defineProperty(obj, 'a', {
+            value: 10, // 给属性赋值
+            writable: false, // 设置为false之后 该属性就不能被重新赋值
+            enumerable: false, // 设置为false之后该属性不能被遍历
+            configurable: false // 设置为false之后该属性不能再使用obeject.defineProperty设置
+        })
+
+        obj.a = 100; // 当writable被设置为false之后 无法给data重新赋值
+        console.log(obj.a); // 依然打印10
+
+        var keys = Object.keys(obj);
+        console.log(keys); // 无法遍历出a属性
+
+        // 再次对a属性进行设置
+        // Object.defineProperty(obj, 'a', {
+        //     value: 'abc'
+        // });
+        // console.log(obj.a); // 报错Uncaught TypeError: Cannot redefine property: a
+
+        var object = {
+            title: '...',
+            desc: '...',
+            price: 2,
+        }
+
+        class UIObj {
+            constructor(obj) {
+                // 配置data对象
+                // 对象克隆
+                obj = { ...obj }
+                Object.freeze(obj);
+                Object.defineProperty(this, 'data', {
+                    value: object,
+                    writable: false,
+                    enumerable: false
+                });
+                // 限定值的类型
+                var interVal = undefined;
+                Object.defineProperty(this, 'choose', {
+                    configurable: false,
+                    get: function() { 
+                        return interVal;
+                    },
+                    set: function(val){
+                        // 可以在这里为该属性限定值的类型
+                        // 设置该属性只能为数字
+                        if(typeof val !== 'number'){
+                            throw new Error('值只能为数字');
+                        }
+                        // 必须大于等于0
+                        if(val < 0){
+                            throw new Error('值必须大于0');
+                        }
+                        // 必须为整数
+                        if(parseInt(val) !== val) {
+                            throw new Error('值必须是整数');
+                        }
+                        interVal = val;
+                    }
+                })
+                // // 进行运算
+                Object.defineProperty(this.data, 'totoalPrice', {
+                    get: function () {
+                        return this.price * this.choose;
+                    }
+                })
+            }
+            // // 另一种写法
+            // get totoalPrice(){
+            //     return this.data.price * this.choose;
+            // }
+        }
+
+        var ulObj = new UIObj(object);
+        ulObj.data = 100; // 不能修改
+        
+        console.log(ulObj.data);
+
+        ulObj.data.choose = 100; // 在这里 ulObj.data 其实相当于在执行 set() 方法
+        console.log(ulObj.choose); // 这里相当于在执行 get() 方法
+
+        // 限制赋值类型
+        // ulObj.data.choose = 'abc'; // 报错
+        // ulObj.data.choose = 3.14; // 报错
+        // ulObj.data.choose = -12; // 报错
+        // 得到计算之后的总价
+        console.log(ulObj.data.totoalPrice);
+        // console.log(ulObj.totoalPrice);
+
+        // 防止用户改动原数据
+        ulObj.choose = 200;
+        // console.log(ulObj.totoalPrice); //  不冻结的话 是200 * 2 这个时候总价也变了
+
+        // 解决： Object.freeze(obj)冻结data对象 冻结之后修改原对象是无效的
+        // 缺点： 别的地方也不能够进行修改了
+
+        // 改进： 对象克隆 冻结克隆后的对象
+        console.log(ulObj.data.totoalPrice); // 无法修改 还是2 * 100
+
+        // 再次进行改动  这里的改动 想当于是改动的原始对象object
+        ulObj.data.choose = 400;
+        console.log(ulObj.data.choose); // 能够改动 因为对象克隆冻结的是 ulObj 这个对象
+        console.log(ulObj.data === object); // true
+
+    </script>
+</body>
+</html>
